@@ -1,0 +1,2 @@
+export const STORE_PRODUCTS_PAGE_SIZE = 100
+export const GRID_PRODUCTS_PAGE_SIZE = 12

@@ -1,0 +1,20 @@
+# Railway config for the Medusa backend service.
+# In Railway: Service → Settings → Config file path → railway.backend.toml
+#
+# Expected in the Railway UI after deploy (from this file):
+#   Builder: Dockerfile
+#   Dockerfile path: Dockerfile.backend
+#   Pre-deploy: npx medusa db:migrate
+#   Start: npx medusa start
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile.backend"
+watchPatterns = ["Dockerfile.backend", "apps/backend/**", "package.json", "package-lock.json"]
+
+[deploy]
+preDeployCommand = "npx medusa db:migrate"
+startCommand = "npx medusa start"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"

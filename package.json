@@ -1,0 +1,53 @@
+{
+  "name": "lanme-swim-store",
+  "private": false,
+  "packageManager": "npm@11.9.0",
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "start": "turbo start",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "backend:seed": "turbo seed --filter=@dtc/backend",
+    "backend:dev": "turbo dev --filter=@dtc/backend",
+    "storefront:dev": "turbo dev --filter=@dtc/storefront",
+    "railway:build:backend": "NODE_ENV=development npm run build --workspace=@dtc/backend && npm install --omit=dev --legacy-peer-deps --prefix apps/backend/.medusa/server",
+    "railway:migrate:backend": "cd apps/backend/.medusa/server && NODE_ENV=production npx medusa db:migrate",
+    "railway:start:backend": "cd apps/backend/.medusa/server && NODE_ENV=production npx medusa start",
+    "railway:build:storefront": "npm run build --workspace=@dtc/storefront",
+    "railway:start:storefront": "npm run start --workspace=@dtc/storefront",
+    "debug-storefront-products": "npx tsx scripts/debug-storefront-products.ts"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.0.5",
+      "@types/react-dom": "19.0.5"
+    }
+  },
+  "devDependencies": {
+    "@medusajs/eslint-plugin": "2.16.0",
+    "eslint": "^9.39.4",
+    "jiti": "^2.7.0",
+    "prettier": "^3.2.5",
+    "turbo": "^2.0.14"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.30.4"
+  },
+  "workspaces": [
+    "apps/**",
+    "!apps/backend/.medusa/**"
+  ],
+  "overrides": {
+    "ajv": "^8.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router": "6.30.4",
+    "react-router-dom": "6.30.4"
+  }
+}

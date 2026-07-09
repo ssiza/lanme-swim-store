@@ -1,0 +1,16 @@
+# Shared Nixpacks settings for Railway services in this monorepo.
+[variables]
+NODE_VERSION = "20"
+NIXPACKS_NODE_VERSION = "20"
+
+# Pin Node 20 (engines ">=20" alone can resolve to nodejs_24 on Nixpacks).
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+# Railway sets NODE_ENV=production on services, which makes `npm ci` skip
+# devDependencies. Medusa's build needs ts-node/typescript to load medusa-config.ts.
+[phases.install]
+cmds = ["npm ci --include=dev"]
+
+[phases.install.env]
+NPM_CONFIG_PRODUCTION = "false"

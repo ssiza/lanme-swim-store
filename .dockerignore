@@ -1,0 +1,26 @@
+# Dependencies and build output (reinstalled in Docker / Nixpacks)
+**/node_modules
+**/.next
+**/.medusa
+**/.turbo
+
+# Local env files (never ship secrets)
+**/.env
+**/.env.*
+apps/storefront/.env*
+apps/backend/.env*
+
+# Git / editor noise
+.git
+.github
+.cursor
+**/*.md
+!apps/backend/src/**/README.md
+
+# OS / editor
+.DS_Store
+.vscode
+
+# Note: do NOT exclude apps/storefront/src here. Nixpacks reads .dockerignore for
+# the storefront service; excluding src breaks `next build`. Backend Dockerfile.backend
+# only COPYs apps/backend, so storefront files in context do not bloat the backend image.

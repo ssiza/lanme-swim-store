@@ -1,0 +1,12 @@
+# Railway config for the Next.js storefront service.
+# In Railway: Service → Settings → Config file path → railway.storefront.toml
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile.storefront"
+
+[deploy]
+startCommand = "node server.js"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"

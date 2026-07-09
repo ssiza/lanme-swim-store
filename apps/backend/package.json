@@ -1,0 +1,67 @@
+{
+  "name": "@dtc/backend",
+  "version": "0.0.1",
+  "description": "A starter for Medusa projects.",
+  "author": "Medusa (https://medusajs.com)",
+  "license": "MIT",
+  "keywords": [
+    "sqlite",
+    "postgres",
+    "typescript",
+    "ecommerce",
+    "headless",
+    "medusa"
+  ],
+  "scripts": {
+    "build": "medusa build && node ./src/scripts/sync-generate-inventory-script.mjs",
+    "start": "medusa start",
+    "start:production": "cd .medusa/server && NODE_ENV=production medusa start",
+    "dev": "medusa develop",
+    "lint": "medusa lint",
+    "test:integration:http": "TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
+    "test:integration:modules": "TEST_TYPE=integration:modules NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
+    "test:unit": "TEST_TYPE=unit NODE_OPTIONS=--experimental-vm-modules jest --silent --runInBand --forceExit",
+    "generate-inventory": "sh -c 'if [ -f src/scripts/generate-inventory.js ]; then FILE=src/scripts/generate-inventory.js; elif [ -f scripts/generate-inventory.js ]; then FILE=scripts/generate-inventory.js; elif [ -f src/scripts/generate-inventory.ts ]; then FILE=src/scripts/generate-inventory.ts; else FILE=scripts/generate-inventory.ts; fi; exec medusa exec ./\"$FILE\" -- \"$@\"' --",
+    "generate-product-variants": "sh -c 'if [ -f src/scripts/generate-product-variants.js ]; then FILE=src/scripts/generate-product-variants.js; elif [ -f scripts/generate-product-variants.js ]; then FILE=scripts/generate-product-variants.js; elif [ -f src/scripts/generate-product-variants.ts ]; then FILE=src/scripts/generate-product-variants.ts; else FILE=scripts/generate-product-variants.ts; fi; exec medusa exec ./\"$FILE\" -- \"$@\"' --",
+    "setup-product-inventory": "sh -c 'if [ -f src/scripts/setup-product-inventory.js ]; then FILE=src/scripts/setup-product-inventory.js; elif [ -f scripts/setup-product-inventory.js ]; then FILE=scripts/setup-product-inventory.js; elif [ -f src/scripts/setup-product-inventory.ts ]; then FILE=src/scripts/setup-product-inventory.ts; else FILE=scripts/setup-product-inventory.ts; fi; exec medusa exec ./\"$FILE\" -- \"$@\"' --"
+  },
+  "dependencies": {
+    "@medusajs/admin-sdk": "2.16.0",
+    "@medusajs/admin-shared": "2.16.0",
+    "@medusajs/caching": "2.16.0",
+    "@medusajs/cli": "2.16.0",
+    "@medusajs/dashboard": "2.16.0",
+    "@medusajs/draft-order": "2.16.0",
+    "@medusajs/framework": "2.16.0",
+    "@medusajs/medusa": "2.16.0",
+    "@medusajs/file-s3": "2.16.0",
+    "@medusajs/payment-stripe": "2.16.0",
+    "@medusajs/ui": "4.1.16",
+    "@react-email/components": "^0.0.31",
+    "@tanstack/react-query": "5.64.2",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-i18next": "13.5.0",
+    "resend": "^4.0.1",
+    "zod": "4.2.0"
+  },
+  "devDependencies": {
+    "@medusajs/test-utils": "2.16.0",
+    "@swc/core": "^1.7.28",
+    "@swc/jest": "^0.2.36",
+    "@types/jest": "^29.5.13",
+    "@types/node": "^20.12.11",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.2.25",
+    "jest": "^29.7.0",
+    "prop-types": "^15.8.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.14",
+    "yalc": "^1.0.0-pre.53"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "npm@11.9.0"
+}
