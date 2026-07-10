@@ -385,7 +385,20 @@ Lifecycle emails respect the admin **Send notification** toggle (`no_notificatio
 
 ## Railway deployment
 
-Deploy the monorepo as **two Railway app services** (backend + storefront) plus **Redis** on Railway. The database can be **Neon** (recommended) or Railway PostgreSQL. Both app services use the **repository root** as their root directory.
+Deploy the monorepo as **two Railway app services** (backend + storefront) plus **Redis** on Railway. The database can be **Neon** (recommended) or Railway PostgreSQL.
+
+This is a **shared npm workspace**. Leave each service’s **Root Directory empty** (`/`) so Docker can see the repo root (`package-lock.json`, workspaces). Per-app `railway.toml` files tell Railway how to split frontend and backend.
+
+### Auto-split on import (recommended)
+
+1. In Railway: **New Project → Deploy from GitHub repo** and select this repository.
+2. Railway detects the JS monorepo and stages a service for each deployable package (`@dtc/backend`, `@dtc/storefront`) using:
+   - `apps/backend/railway.toml`
+   - `apps/storefront/railway.toml`
+3. Confirm both services keep **Root Directory** empty and Config as Code points at those package files.
+4. Add **Redis**, set env vars (below), generate public domains, then deploy **backend first**, then storefront.
+
+If you already have services wired to the root aliases `railway.backend.toml` / `railway.storefront.toml`, those still work — prefer switching Config as Code to `/apps/backend/railway.toml` and `/apps/storefront/railway.toml`.
 
 ### Production URLs
 
@@ -404,24 +417,24 @@ Admin dashboard: `https://<backend-service>.up.railway.app/app`
 
 | Setting | Value |
 |---------|-------|
-| Root directory | `/` (repo root) |
-| Config file | `railway.backend.toml` |
-| Builder | `Dockerfile.backend` (not Nixpacks — avoids secret/env bake failures on Metal) |
+| Root directory | empty / `/` (repo root — required) |
+| Config as Code | `/apps/backend/railway.toml` |
+| Builder | `apps/backend/Dockerfile` (not Railpack — avoids secret/env bake failures) |
 | Start command | `npx medusa start` |
 | Health check | `GET /health` |
 
-Production image is built with `Dockerfile.backend`: `medusa build` output in a Node 20 slim image. Railway `PORT` is read automatically by the Medusa CLI. Migrations run via `preDeployCommand` before each deploy.
+Production image is built with `apps/backend/Dockerfile`: `medusa build` output in a Node 20 slim image. Railway `PORT` is read automatically by the Medusa CLI. Migrations run via `preDeployCommand` before each deploy.
 
 #### Storefront service
 
 | Setting | Value |
 |---------|-------|
-| Root directory | `/` (repo root) |
-| Config file | `railway.storefront.toml` |
-| Builder | `Dockerfile.storefront` (storefront-only `npm ci` — much faster than full-monorepo Nixpacks) |
-| Health check | `GET /icon.png` (static; avoids middleware/backend during health checks) |
+| Root directory | empty / `/` (repo root — required) |
+| Config as Code | `/apps/storefront/railway.toml` |
+| Builder | `apps/storefront/Dockerfile` (storefront-only `npm ci`) |
+| Health check | `GET /api/health` |
 
-`NEXT_PUBLIC_*` variables must be set on the service **before** deploy — they are baked in at `next build`. The container runs `node apps/storefront/server.js` (Next.js standalone) on Railway `PORT`.
+`NEXT_PUBLIC_*` variables must be set on the service **before** deploy — they are baked in at `next build`. The container runs `node server.js` (Next.js standalone) on Railway `PORT`.
 
 **Docker builds:** Railway does not inject service variables into `RUN` steps automatically. Each `NEXT_PUBLIC_*` variable must be enabled **Available at Build Time** (variable ⋮ menu in Railway). The Dockerfile declares matching `ARG` names so Railway passes them as build-args.
 
@@ -477,37 +490,35 @@ When `REDIS_URL` is set, the backend registers Medusa Redis modules for cache, e
 
 ### Deployment sequence
 
-1. Create a Railway project.
+1. Create a Railway project from this GitHub repo (monorepo auto-import should stage **backend** + **storefront**).
 2. Add **Redis** on Railway (or use another Redis host).
 3. Create a **Neon** project and copy the connection string into `DATABASE_URL` on the backend service.
-4. Add the **backend** service from this repo (root directory = repo root).
-5. Set config file to `railway.backend.toml`.
-6. Set backend environment variables (`DATABASE_URL` = Neon URL, `REDIS_URL` = `${{Redis.REDIS_URL}}`, etc.).
-7. Deploy the backend. Migrations run automatically via `preDeployCommand` against your Neon database.
-8. Create an admin user (Railway shell on the backend service):
+4. Confirm backend Config as Code is `/apps/backend/railway.toml` and Root Directory is empty.
+5. Set backend environment variables (`DATABASE_URL` = Neon URL, `REDIS_URL` = `${{Redis.REDIS_URL}}`, etc.).
+6. Deploy the backend. Migrations run automatically via `preDeployCommand` against your Neon database.
+7. Create an admin user (Railway shell on the backend service):
    ```bash
-   cd apps/backend/.medusa/server && npx medusa user -e admin@lanmeswim.com -p <password>
+   npx medusa user -e admin@lanmeswim.com -p <password>
    ```
-9. Open `https://<backend-service>.up.railway.app/app`, sign in, and copy the **publishable API key** from Settings → Developer.
-10. Enable **Stripe** on your region(s) in Admin (Settings → Regions).
-11. Add the **storefront** service from the same repo.
-12. Set config file to `railway.storefront.toml`.
-13. Set storefront environment variables (including the publishable key).
-14. Deploy the storefront.
-15. Configure the **Stripe webhook**:
+8. Open `https://<backend-service>.up.railway.app/app`, sign in, and copy the **publishable API key** from Settings → Developer.
+9. Enable **Stripe** on your region(s) in Admin (Settings → Regions).
+10. Confirm storefront Config as Code is `/apps/storefront/railway.toml` and Root Directory is empty.
+11. Set storefront environment variables (including the publishable key). Enable **Available at Build Time** on every `NEXT_PUBLIC_*` variable.
+12. Deploy the storefront.
+13. Configure the **Stripe webhook**:
     ```
     POST https://<backend-service>.up.railway.app/hooks/payment/stripe_stripe
     ```
     Set `STRIPE_WEBHOOK_SECRET` on the backend and redeploy if needed.
-16. **Test S3:** upload a hero image or product image in Admin; confirm the URL points to S3.
-17. **Test Resend:** place a test order and trigger password reset; confirm email links use `STOREFRONT_URL`.
-18. **Test checkout:** full browse → cart → Stripe payment → order confirmation.
+14. **Test S3:** upload a hero image or product image in Admin; confirm the URL points to S3.
+15. **Test Resend:** place a test order and trigger password reset; confirm email links use `STOREFRONT_URL`.
+16. **Test checkout:** full browse → cart → Stripe payment → order confirmation.
 
 ### Troubleshooting
 
 **Healthcheck fails with `relation "tax_provider" does not exist`**
 
-The production database has no Medusa schema yet. Redeploy after ensuring `railway.backend.toml` includes `preDeployCommand`, or run manually:
+The production database has no Medusa schema yet. Redeploy after ensuring `apps/backend/railway.toml` includes `preDeployCommand`, or run manually:
 
 ```bash
 npm run railway:migrate:backend
@@ -521,10 +532,11 @@ npm run railway:migrate:backend
 
 **Build fails on Railway / admin login blocked**
 
-- Backend uses **`Dockerfile.backend`** instead of Nixpacks so secrets (`JWT_SECRET`, `COOKIE_SECRET`) are not written into the image at build time.
+- Backend uses **`apps/backend/Dockerfile`** instead of Railpack so secrets (`JWT_SECRET`, `COOKIE_SECRET`) are not written into the image at build time.
 - `ADMIN_CORS` and `AUTH_CORS` must be **HTTPS origins** (your backend + storefront URLs), never `DATABASE_URL` or other `postgresql://` strings.
 - `JWT_SECRET` and `COOKIE_SECRET` should be hex-only (`openssl rand -hex 32`).
-- Storefront uses **`Dockerfile.storefront`** instead of Nixpacks — installs only the storefront workspace (not the full Medusa backend) and produces a smaller standalone Next.js image.
+- Storefront uses **`apps/storefront/Dockerfile`** instead of Railpack — installs only the storefront workspace (not the full Medusa backend) and produces a smaller standalone Next.js image.
+- If a service builds the wrong app, check Root Directory is empty and Config as Code points at the matching `apps/*/railway.toml`.
 
 ### Local production scripts
 

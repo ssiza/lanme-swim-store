@@ -1,6 +1,8 @@
-# Compatibility alias for existing Railway services that point here.
-# Prefer apps/backend/railway.toml (auto-detected on monorepo import).
-# In Railway: Service → Settings → Config as Code → /apps/backend/railway.toml
+# Detected by Railway monorepo auto-import for @dtc/backend.
+# Keep Root Directory empty (/) — this is a shared npm workspace; Docker build
+# context must be the repository root so package-lock.json and workspaces resolve.
+#
+# dockerfilePath is relative to the repository root (not this folder).
 
 [build]
 builder = "DOCKERFILE"

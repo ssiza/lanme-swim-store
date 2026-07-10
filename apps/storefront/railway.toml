@@ -1,6 +1,9 @@
-# Compatibility alias for existing Railway services that point here.
-# Prefer apps/storefront/railway.toml (auto-detected on monorepo import).
-# In Railway: Service → Settings → Config as Code → /apps/storefront/railway.toml
+# Detected by Railway monorepo auto-import for @dtc/storefront.
+# Keep Root Directory empty (/) — shared npm workspace; Docker build context
+# must be the repository root.
+#
+# NEXT_PUBLIC_* vars must be set on this service and enabled
+# "Available at Build Time" (Variables → ⋮ → Available at Build Time).
 
 [build]
 builder = "DOCKERFILE"

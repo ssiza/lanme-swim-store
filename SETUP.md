@@ -23,7 +23,7 @@ cp apps/backend/.env.template apps/backend/.env
 cp apps/storefront/.env.template apps/storefront/.env
 ```
 
-See `README.md` for full Railway deployment and variable reference. Use **separate** values from Fanarc for:
+See `README.md` for full Railway deployment and variable reference. Importing this repo into Railway should auto-stage **backend** and **storefront** from `apps/*/railway.toml`. Use **separate** values from Fanarc for:
 
 - `DATABASE_URL` (new Neon/Postgres database)
 - `JWT_SECRET` / `COOKIE_SECRET`

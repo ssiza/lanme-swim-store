@@ -21,6 +21,6 @@ apps/backend/.env*
 .DS_Store
 .vscode
 
-# Note: do NOT exclude apps/storefront/src here. Nixpacks reads .dockerignore for
-# the storefront service; excluding src breaks `next build`. Backend Dockerfile.backend
-# only COPYs apps/backend, so storefront files in context do not bloat the backend image.
+# Note: do NOT exclude apps/storefront/src here. Excluding src breaks `next build`.
+# Backend Dockerfile only COPYs apps/backend, so storefront files in context do not
+# bloat the backend image.

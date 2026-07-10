@@ -1,4 +1,5 @@
 # Medusa backend for Railway (Dockerfile builder).
+# Build context must be the monorepo root (do not set Railway Root Directory).
 # Ops scripts under apps/backend/scripts are bundled into .medusa/server at build time.
 # Secrets stay runtime-only — not baked into the image.
 

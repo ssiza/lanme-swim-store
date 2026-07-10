@@ -1,4 +1,5 @@
 # Next.js storefront for Railway (Dockerfile builder).
+# Build context must be the monorepo root (do not set Railway Root Directory).
 # Installs storefront workspace only — avoids pulling the full Medusa backend into the image.
 #
 # Railway: each NEXT_PUBLIC_* variable must be set on the storefront service AND
