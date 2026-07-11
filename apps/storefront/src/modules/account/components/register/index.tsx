@@ -1,6 +1,6 @@
 "use client"
 
-import { SITE_NAME } from "@lib/constants/site"
+import { SITE_COPY, SITE_NAME } from "@lib/constants/site"
 import { useActionState } from "react"
 import Input from "@modules/common/components/input"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
@@ -21,12 +21,9 @@ const Register = ({ setCurrentView }: Props) => {
       className="max-w-sm flex flex-col items-center"
       data-testid="register-page"
     >
-      <h1 className="text-large-semi uppercase mb-6">
-        Become a {SITE_NAME} Member
-      </h1>
-      <p className="text-center text-base-regular text-ui-fg-base mb-4">
-        Create your {SITE_NAME} member profile and get access to an enhanced
-        shopping experience.
+      <h1 className="text-large-semi mb-6">{SITE_COPY.createAccountTitle}</h1>
+      <p className="text-center text-base-regular text-ui-fg-subtle mb-4">
+        {SITE_COPY.createAccountBody}
       </p>
       {message?.state === "verification_required" && (
         <div
@@ -99,11 +96,11 @@ const Register = ({ setCurrentView }: Props) => {
           .
         </span>
         <SubmitButton className="w-full mt-6" data-testid="register-button">
-          Join
+          Create account
         </SubmitButton>
       </form>
       <span className="text-center text-ui-fg-base text-small-regular mt-6">
-        Already a member?{" "}
+        Already have an account?{" "}
         <button
           onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
           className="underline"

@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 
+import { SITE_COPY } from "@lib/constants/site"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -41,8 +42,8 @@ export default function CollectionTemplate({
             countryCode={countryCode}
             route={`/${countryCode}/collections/${collection.handle}`}
             collectionHandle={collection.handle}
-            emptyTitle={`No products in ${collection.title}`}
-            emptyDescription="Products assigned to this collection will appear here."
+            emptyTitle={SITE_COPY.emptyCollectionTitle}
+            emptyDescription={SITE_COPY.emptyCollectionBody}
           />
         </Suspense>
       </div>

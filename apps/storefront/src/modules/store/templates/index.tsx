@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 
+import { SITE_COPY } from "@lib/constants/site"
 import { STORE_PRODUCTS_PAGE_SIZE } from "@lib/constants/products"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
@@ -26,8 +27,16 @@ const StoreTemplate = ({
     >
       <RefinementList sortBy={sort} />
       <div className="w-full">
-        <div className="mb-8 text-2xl-semi">
-          <h1 data-testid="store-page-title">All products</h1>
+        <div className="mb-8">
+          <h1
+            data-testid="store-page-title"
+            className="font-display text-3xl font-normal tracking-tight text-brand-ink"
+          >
+            {SITE_COPY.shopAll}
+          </h1>
+          <p className="mt-2 text-ui-fg-subtle text-base-regular">
+            {SITE_COPY.collectionsIntro}
+          </p>
         </div>
         <Suspense fallback={<SkeletonProductGrid />}>
           <PaginatedProducts
@@ -36,8 +45,8 @@ const StoreTemplate = ({
             countryCode={countryCode}
             route={`/${countryCode}/store`}
             pageSize={STORE_PRODUCTS_PAGE_SIZE}
-            emptyTitle="No products yet"
-            emptyDescription="Published products assigned to this store will appear here."
+            emptyTitle={SITE_COPY.emptyCatalogTitle}
+            emptyDescription={SITE_COPY.emptyCatalogBody}
           />
         </Suspense>
       </div>

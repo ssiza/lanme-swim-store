@@ -3,7 +3,7 @@ import { Metadata } from "next"
 import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
 import EmptyProducts from "@modules/store/components/empty-products"
-import { SITE_DESCRIPTION, SITE_NAME } from "@lib/constants/site"
+import { SITE_COPY, SITE_DESCRIPTION, SITE_NAME } from "@lib/constants/site"
 import { getDefaultCountryCode } from "@lib/constants/region"
 import { getHomepageSettings } from "@lib/data/homepage"
 import { listCollections } from "@lib/data/collections"
@@ -62,7 +62,7 @@ export default async function Home(props: {
         <div className="content-container py-12">
           <EmptyProducts
             title="Welcome to Lanmè Swim"
-            description={`We could not load products for this region. Visit /${getDefaultCountryCode()}/store to continue.`}
+            description={`We could not load products for this region. Try /${getDefaultCountryCode()}/store to continue shopping.`}
           />
         </div>
       </>
@@ -78,8 +78,8 @@ export default async function Home(props: {
         />
         <div className="content-container py-12">
           <EmptyProducts
-            title="No collections yet"
-            description="Browse the full store while collections are being set up."
+            title={SITE_COPY.emptyCatalogTitle}
+            description="Browse all swimwear while collections are being set up."
           />
         </div>
       </>

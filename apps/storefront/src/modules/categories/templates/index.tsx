@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
+import { SITE_COPY } from "@lib/constants/site"
 import InteractiveLink from "@modules/common/components/interactive-link"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
@@ -92,8 +93,8 @@ export default function CategoryTemplate({
             countryCode={countryCode}
             route={`/${countryCode}/categories/${getCategoryPath(category)}`}
             categoryHandle={category.handle}
-            emptyTitle={`No products in ${category.name}`}
-            emptyDescription="Products assigned to this category will appear here."
+            emptyTitle={SITE_COPY.emptyCategoryTitle}
+            emptyDescription={SITE_COPY.emptyCategoryBody}
           />
         </Suspense>
       </div>

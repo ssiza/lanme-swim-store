@@ -1,7 +1,7 @@
 import { listCategories } from "@lib/data/categories"
 import { listCollections } from "@lib/data/collections"
 import { getHomepageSettings } from "@lib/data/homepage"
-import { SITE_COPYRIGHT } from "@lib/constants/site"
+import { SITE_COPY, SITE_COPYRIGHT } from "@lib/constants/site"
 import { getCategoryPath } from "@lib/util/category-path"
 import { Text, clx } from "@modules/common/components/ui"
 import SiteLogo from "@modules/common/components/site-logo"
@@ -148,7 +148,7 @@ export default async function Footer() {
             {collectionsWithProducts.length > 0 && (
               <div className="flex flex-col gap-y-2">
                 <span className="txt-small-plus txt-ui-fg-base">
-                  Collections
+                  {SITE_COPY.collections}
                 </span>
                 <ul
                   className={clx(
@@ -172,14 +172,14 @@ export default async function Footer() {
               </div>
             )}
             <div className="flex flex-col gap-y-2">
-              <span className="txt-small-plus txt-ui-fg-base">Shop</span>
+              <span className="txt-small-plus txt-ui-fg-base">{SITE_COPY.shop}</span>
               <ul className="grid grid-cols-1 gap-y-2 text-ui-fg-subtle txt-small">
                 <li>
                   <LocalizedClientLink
                     className="hover:text-ui-fg-base"
                     href="/store"
                   >
-                    Store
+                    {SITE_COPY.shopAll}
                   </LocalizedClientLink>
                 </li>
                 <li>
@@ -187,7 +187,7 @@ export default async function Footer() {
                     className="hover:text-ui-fg-base"
                     href="/account"
                   >
-                    Account
+                    {SITE_COPY.account}
                   </LocalizedClientLink>
                 </li>
                 <li>
@@ -195,7 +195,7 @@ export default async function Footer() {
                     className="hover:text-ui-fg-base"
                     href="/cart"
                   >
-                    Cart
+                    {SITE_COPY.bag}
                   </LocalizedClientLink>
                 </li>
               </ul>

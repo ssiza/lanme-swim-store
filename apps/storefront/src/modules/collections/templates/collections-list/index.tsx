@@ -1,5 +1,6 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import EmptyProducts from "@modules/store/components/empty-products"
+import { SITE_COPY } from "@lib/constants/site"
 import { HttpTypes } from "@medusajs/types"
 
 export default function CollectionsListTemplate({
@@ -24,16 +25,16 @@ export default function CollectionsListTemplate({
   return (
     <div className="content-container py-12">
       <div className="mb-10">
-        <h1 className="text-2xl-semi">Collections</h1>
-        <p className="text-ui-fg-subtle mt-2">
-          Browse curated product groups.
-        </p>
+        <h1 className="font-display text-3xl font-normal tracking-tight text-brand-ink">
+          {SITE_COPY.collections}
+        </h1>
+        <p className="text-ui-fg-subtle mt-2">{SITE_COPY.collectionsIntro}</p>
       </div>
 
       {!collections.length ? (
         <EmptyProducts
-          title="No collections with products"
-          description="Collections will appear here once products are assigned."
+          title={SITE_COPY.emptyCatalogTitle}
+          description={SITE_COPY.emptyCatalogBody}
         />
       ) : (
         <ul className="grid grid-cols-1 small:grid-cols-2 medium:grid-cols-3 gap-4">

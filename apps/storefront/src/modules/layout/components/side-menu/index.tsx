@@ -1,7 +1,7 @@
 "use client"
 
 import { Popover, PopoverPanel, Transition } from "@headlessui/react"
-import { SITE_COPYRIGHT } from "@lib/constants/site"
+import { SITE_COPY, SITE_COPYRIGHT } from "@lib/constants/site"
 import { Locale } from "@lib/data/locales"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import { ArrowRightMini, XMark } from "@medusajs/icons"
@@ -29,10 +29,10 @@ const SideMenu = ({
   const languageToggleState = useToggleState()
 
   const sideMenuItems = {
-    Store: "/store",
-    Collections: collectionsHref,
-    Account: "/account",
-    Cart: "/cart",
+    [SITE_COPY.shop]: "/store",
+    [SITE_COPY.collections]: collectionsHref,
+    [SITE_COPY.account]: "/account",
+    [SITE_COPY.bag]: "/cart",
   }
 
   return (

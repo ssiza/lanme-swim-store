@@ -33,6 +33,11 @@ module.exports = {
           80: "#1F2937",
           90: "#111827",
         },
+        brand: {
+          ink: "#14212B",
+          sea: "#1B5F6E",
+          mist: "#E8F1F3",
+        },
       },
       borderRadius: {
         none: "0px",
@@ -59,14 +64,19 @@ module.exports = {
       },
       fontFamily: {
         sans: [
-          "Inter",
+          "var(--font-outfit)",
+          "Outfit",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",
-          "Roboto",
-          "Helvetica Neue",
-          "Ubuntu",
           "sans-serif",
+        ],
+        display: [
+          "var(--font-fraunces)",
+          "Fraunces",
+          "Georgia",
+          "Times New Roman",
+          "serif",
         ],
       },
       keyframes: {

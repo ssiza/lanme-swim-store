@@ -1,4 +1,5 @@
 import repeat from "@lib/util/repeat"
+import { SITE_COPY } from "@lib/constants/site"
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Table } from "@modules/common/components/ui"
 
@@ -14,7 +15,9 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
   return (
     <div>
       <div className="pb-3 flex items-center">
-        <Heading className="text-[2rem] leading-[2.75rem]">Cart</Heading>
+        <Heading className="text-[2rem] leading-[2.75rem] font-display font-normal tracking-tight">
+          {SITE_COPY.bag}
+        </Heading>
       </div>
       <Table>
         <Table.Header className="border-t-0">

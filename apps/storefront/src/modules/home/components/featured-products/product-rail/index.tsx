@@ -1,4 +1,5 @@
 import { listProducts } from "@lib/data/products"
+import { SITE_COPY } from "@lib/constants/site"
 import { HttpTypes } from "@medusajs/types"
 import { Text } from "@modules/common/components/ui"
 
@@ -33,10 +34,12 @@ export default async function ProductRail({
 
   return (
     <div className="content-container py-12 small:py-24">
-      <div className="flex justify-between mb-8">
-        <Text className="txt-xlarge">{collection.title}</Text>
+      <div className="flex justify-between mb-8 items-baseline gap-4">
+        <Text className="font-display text-2xl font-normal tracking-tight text-brand-ink small:text-3xl">
+          {collection.title}
+        </Text>
         <InteractiveLink href={`/collections/${collection.handle}`}>
-          View all
+          {SITE_COPY.shopSwim}
         </InteractiveLink>
       </div>
       <ul className="grid grid-cols-2 small:grid-cols-3 gap-x-6 gap-y-24 small:gap-y-36">
