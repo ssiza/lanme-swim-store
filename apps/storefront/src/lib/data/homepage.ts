@@ -13,6 +13,16 @@ import {
 
 export type HomepageSettings = {
   hero_background_image_url: string | null
+  footer_about: string | null
+  footer_address: string | null
+  footer_links: Array<{ label: string; href: string }>
+}
+
+const EMPTY_SETTINGS: HomepageSettings = {
+  hero_background_image_url: null,
+  footer_about: null,
+  footer_address: null,
+  footer_links: [],
 }
 
 export const getHomepageSettings = async (): Promise<HomepageSettings> => {
@@ -46,13 +56,18 @@ export const getHomepageSettings = async (): Promise<HomepageSettings> => {
 
     logFetchEnd("getHomepageSettings", {
       hasHeroImage: Boolean(settings.hero_background_image_url),
+      hasFooterAbout: Boolean(settings.footer_about),
     })
 
-    return settings
+    return {
+      ...EMPTY_SETTINGS,
+      ...settings,
+      footer_links: Array.isArray(settings.footer_links)
+        ? settings.footer_links
+        : [],
+    }
   } catch (error) {
     logFetchError("getHomepageSettings", error)
-    return {
-      hero_background_image_url: null,
-    }
+    return EMPTY_SETTINGS
   }
 }

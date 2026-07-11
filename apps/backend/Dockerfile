@@ -38,4 +38,5 @@ RUN apt-get update \
 COPY --from=build /app/apps/backend/.medusa/server ./
 
 EXPOSE 9000
-CMD ["npx", "medusa", "start"]
+# Migrate on boot so first deploy works even if Railway preDeploy/start overrides are unset.
+CMD ["sh", "-c", "npx medusa db:migrate && npx medusa start"]

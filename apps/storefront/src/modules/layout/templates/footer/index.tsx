@@ -1,35 +1,93 @@
 import { listCategories } from "@lib/data/categories"
 import { listCollections } from "@lib/data/collections"
+import { getHomepageSettings } from "@lib/data/homepage"
 import { SITE_COPYRIGHT } from "@lib/constants/site"
 import { getCategoryPath } from "@lib/util/category-path"
 import { Text, clx } from "@modules/common/components/ui"
 import SiteLogo from "@modules/common/components/site-logo"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import type { ReactNode } from "react"
+
+function FooterLinkItem({
+  href,
+  children,
+}: {
+  href: string
+  children: ReactNode
+}) {
+  const isExternal = /^https?:\/\//i.test(href)
+
+  if (isExternal) {
+    return (
+      <a
+        href={href}
+        className="hover:text-ui-fg-base"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {children}
+      </a>
+    )
+  }
+
+  return (
+    <LocalizedClientLink className="hover:text-ui-fg-base" href={href}>
+      {children}
+    </LocalizedClientLink>
+  )
+}
 
 export default async function Footer() {
-  const { collections } = await listCollections({
-    fields: "id, handle, title, *products",
-  })
-  const productCategories = await listCategories()
+  const [{ collections }, productCategories, settings] = await Promise.all([
+    listCollections({
+      fields: "id, handle, title, *products",
+    }),
+    listCategories(),
+    getHomepageSettings(),
+  ])
 
   const collectionsWithProducts =
     collections?.filter((collection) => (collection.products?.length ?? 0) > 0) ??
     []
 
+  const about = settings.footer_about
+  const address = settings.footer_address
+  const moreLinks = settings.footer_links ?? []
+  const addressLines = address
+    ? address.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
+    : []
+
   return (
     <footer className="border-t border-ui-border-base w-full">
       <div className="content-container flex flex-col w-full">
-        <div className="flex flex-col gap-y-6 xsmall:flex-row items-start justify-between py-40">
-          <div>
+        <div className="flex flex-col gap-y-10 xsmall:flex-row xsmall:items-start xsmall:justify-between py-40">
+          <div className="flex max-w-sm flex-col gap-y-4">
             <LocalizedClientLink
               href="/"
-              className="inline-block hover:opacity-90 transition-opacity"
+              className="inline-block w-fit hover:opacity-90 transition-opacity"
             >
               <SiteLogo height={28} />
             </LocalizedClientLink>
+
+            {about && (
+              <Text className="txt-small text-ui-fg-subtle whitespace-pre-line">
+                {about}
+              </Text>
+            )}
+
+            {addressLines.length > 0 && (
+              <address className="not-italic txt-small text-ui-fg-subtle">
+                {addressLines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </address>
+            )}
           </div>
-          <div className="text-small-regular gap-10 md:gap-x-16 grid grid-cols-2 sm:grid-cols-3">
+
+          <div className="text-small-regular gap-10 md:gap-x-16 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
             {productCategories && productCategories?.length > 0 && (
               <div className="flex flex-col gap-y-2">
                 <span className="txt-small-plus txt-ui-fg-base">
@@ -68,18 +126,17 @@ export default async function Footer() {
                         </LocalizedClientLink>
                         {children && (
                           <ul className="grid grid-cols-1 ml-3 gap-2">
-                            {children &&
-                              children.map((child) => (
-                                <li key={child.id}>
-                                  <LocalizedClientLink
-                                    className="hover:text-ui-fg-base"
-                                    href={`/categories/${c.handle}/${child.handle}`}
-                                    data-testid="category-link"
-                                  >
-                                    {child.name}
-                                  </LocalizedClientLink>
-                                </li>
-                              ))}
+                            {children.map((child) => (
+                              <li key={child.id}>
+                                <LocalizedClientLink
+                                  className="hover:text-ui-fg-base"
+                                  href={`/categories/${c.handle}/${child.handle}`}
+                                  data-testid="category-link"
+                                >
+                                  {child.name}
+                                </LocalizedClientLink>
+                              </li>
+                            ))}
                           </ul>
                         )}
                       </li>
@@ -143,6 +200,20 @@ export default async function Footer() {
                 </li>
               </ul>
             </div>
+            {moreLinks.length > 0 && (
+              <div className="flex flex-col gap-y-2">
+                <span className="txt-small-plus txt-ui-fg-base">More</span>
+                <ul className="grid grid-cols-1 gap-y-2 text-ui-fg-subtle txt-small">
+                  {moreLinks.map((link) => (
+                    <li key={`${link.label}-${link.href}`}>
+                      <FooterLinkItem href={link.href}>
+                        {link.label}
+                      </FooterLinkItem>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
         <div className="flex w-full mb-16 justify-between text-ui-fg-muted">

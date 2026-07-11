@@ -1,0 +1,24 @@
+# Default Config as Code when the service has no custom config file path set.
+# Backend service: leave Config as Code empty OR set /apps/backend/railway.toml
+# Storefront service: MUST set Config as Code to /apps/storefront/railway.toml
+#
+# Root Directory must stay empty (/) — shared npm workspace.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "apps/backend/Dockerfile"
+watchPatterns = [
+  "apps/backend/**",
+  "apps/backend/Dockerfile",
+  "package.json",
+  "package-lock.json",
+  ".npmrc",
+  ".dockerignore",
+]
+
+[deploy]
+# Migrate in startCommand so first boot works even if Config as Code path is unset.
+startCommand = "sh -c 'npx medusa db:migrate && npx medusa start'"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
