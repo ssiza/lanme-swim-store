@@ -1,7 +1,7 @@
 /** Time-based revalidation for product discovery pages and fetches (seconds). */
 export const PRODUCT_DISCOVERY_REVALIDATE = 60
 
-/** Global Next.js cache tags — not tied to per-session cookies. */
+/** Global Next.js cache tags, not tied to per-session cookies. */
 export const DISCOVERY_CACHE_TAGS = {
   products: "storefront-products",
   collections: "storefront-collections",

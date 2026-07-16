@@ -1,3 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 40" fill="none" role="img" aria-label="Lanmè Swim">
-  <text x="0" y="30" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="400" fill="currentColor" letter-spacing="0.02em">Lanmè Swim</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 72" fill="none" role="img" aria-label="Lanme Swim">
+  <defs>
+    <linearGradient id="sunset" x1="0" y1="9" x2="0" y2="51" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff7a00"/>
+      <stop offset="0.62" stop-color="#ffc400"/>
+      <stop offset="1" stop-color="#ffe36c"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="10" y1="53" x2="80" y2="53" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#12b5e5"/>
+      <stop offset="1" stop-color="#0b6fd3"/>
+    </linearGradient>
+  </defs>
+  <g aria-hidden="true">
+    <circle cx="43" cy="32" r="28" fill="url(#sunset)"/>
+    <path d="M15 42c15 2 31 1 48-2 8-1 15-1 22 1-12 4-25 7-39 7-13 0-23-2-31-6Z" fill="#0c2a51"/>
+    <path d="M24 30c10 1 21 1 33-1 8-1 16-1 24 1-14 3-27 5-39 5-7 0-13-2-18-5Z" fill="#0c2a51"/>
+    <path d="M58 18c10 0 19 1 27 5-9-1-18-1-27 0-8 1-16 1-24-1 8-2 16-4 24-4Z" fill="#0c2a51"/>
+    <path d="M24 55c18 4 40 4 60-1-19 9-43 11-67 4 2-1 4-2 7-3Z" fill="url(#wave)"/>
+    <path d="M12 62c24 7 52 7 76-1-18 11-51 13-80 4 1-1 2-2 4-3Z" fill="#12b5e5"/>
+    <path d="M37 53c-1-12-1-24 1-36" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+    <path d="M37 24c-8-8-16-9-27-4 12 1 20 4 27 12" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M39 28c8-9 17-11 29-8-12 2-21 6-29 16" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M38 39c-6-7-13-9-22-6 9 1 16 4 22 12" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M40 42c7-7 14-9 23-6-9 1-16 5-23 13" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <text x="88" y="48" font-family="Georgia, 'Times New Roman', serif" font-size="45" font-weight="400" fill="#0c2a51">Lanm&#232;</text>
+  <text x="184" y="25" font-family="'Brush Script MT', 'Segoe Script', cursive" font-size="29" font-weight="500" fill="#f59e0b">Swim</text>
 </svg>

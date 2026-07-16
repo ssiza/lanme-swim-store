@@ -87,7 +87,7 @@ const ShippingInfoTab = () => {
           <div>
             <span className="font-semibold">Shipping</span>
             <p className="max-w-sm">
-              Orders typically arrive in 3–5 business days. You&apos;ll get
+              Orders typically arrive in 3 to 5 business days. You&apos;ll get
               tracking as soon as your swimwear ships.
             </p>
           </div>

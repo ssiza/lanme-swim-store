@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   try {
     body = await request.json()
   } catch {
-    // Empty body is valid — revalidate all discovery caches.
+    // Empty body is valid, revalidate all discovery caches.
   }
 
   const result = revalidateDiscoveryCache(body)
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       event: "storefront.revalidate",
       ...result,
       timestamp: new Date().toISOString(),
-    })
+    }),
   )
 
   return Response.json(result)

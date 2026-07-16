@@ -21,7 +21,7 @@ export default async function Nav() {
 
   return (
     <div className="sticky top-0 inset-x-0 z-50 group">
-      <header className="relative h-16 mx-auto border-b duration-200 bg-white/95 backdrop-blur-sm border-ui-border-base">
+      <header className="relative h-16 mx-auto duration-200 bg-white/95 backdrop-blur-sm shadow-[0_10px_30px_rgba(12,42,81,0.07)]">
         <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex items-center justify-between w-full h-full text-small-regular">
           <div className="flex-1 basis-0 h-full flex items-center">
             <div className="h-full">
@@ -40,7 +40,7 @@ export default async function Nav() {
               className="hover:opacity-90 transition-opacity"
               data-testid="nav-store-link"
             >
-              <SiteLogo height={36} priority />
+              <SiteLogo height={42} priority />
             </LocalizedClientLink>
           </div>
 

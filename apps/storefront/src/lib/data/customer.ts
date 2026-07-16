@@ -46,7 +46,7 @@ async function requestVerificationEmail(email: string, token: string) {
     },
     {
       authorization: `Bearer ${token}`,
-    }
+    },
   )
 }
 
@@ -107,7 +107,7 @@ export const updateCustomer = async (body: HttpTypes.StoreUpdateCustomer) => {
 
 export async function signup(
   _currentState: unknown,
-  formData: FormData
+  formData: FormData,
 ): Promise<CustomerAuthState> {
   const password = formData.get("password") as string
   const customerForm = {
@@ -141,13 +141,13 @@ export async function signup(
   await setPendingCustomer(customerForm)
 
   // Continue by logging in. The login response tells us whether the backend
-  // requires email verification — we don't need a storefront-side flag.
+  // requires email verification, so we don't need a storefront-side flag.
   return completeLogin(customerForm.email, password)
 }
 
 export async function login(
   _currentState: unknown,
-  formData: FormData
+  formData: FormData,
 ): Promise<CustomerAuthState> {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
@@ -160,7 +160,7 @@ export async function login(
 // email verification is enabled.
 async function completeLogin(
   email: string,
-  password: string
+  password: string,
 ): Promise<CustomerAuthState> {
   let result: Awaited<ReturnType<typeof sdk.auth.login>>
 
@@ -203,7 +203,7 @@ async function completeLogin(
 
   let token = result
 
-  // The token may not be tied to a customer record yet — right after
+  // The token may not be tied to a customer record yet, right after
   // registration, or after verifying a brand-new account. Ask the backend:
   // `/store/customers/me` rejects tokens without a registered actor, so a
   // failed retrieve means we still need to create the customer, then log in
@@ -225,7 +225,7 @@ async function completeLogin(
           phone: pending?.phone,
         },
         {},
-        { authorization: `Bearer ${token}` }
+        { authorization: `Bearer ${token}` },
       )
 
       token = (await sdk.auth.login("customer", "emailpass", {
@@ -258,7 +258,7 @@ async function completeLogin(
 // The confirm route doesn't require authentication, so this works even when the
 // customer opens the link on a different device than the one they signed up on.
 export async function confirmEmailVerification(
-  token: string
+  token: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     await sdk.auth.verification.confirm({ code: token })
@@ -270,7 +270,7 @@ export async function confirmEmailVerification(
 
 export async function resetCustomerPassword(
   _currentState: unknown,
-  formData: FormData
+  formData: FormData,
 ): Promise<PasswordResetState> {
   const token = formData.get("token") as string
   const password = formData.get("password") as string
@@ -292,12 +292,7 @@ export async function resetCustomerPassword(
   }
 
   try {
-    await sdk.auth.updateProvider(
-      "customer",
-      "emailpass",
-      { password },
-      token
-    )
+    await sdk.auth.updateProvider("customer", "emailpass", { password }, token)
 
     return { state: "success" }
   } catch (error) {
@@ -338,7 +333,7 @@ export async function transferCart() {
 
 export const addCustomerAddress = async (
   currentState: Record<string, unknown>,
-  formData: FormData
+  formData: FormData,
 ): Promise<{ success: boolean; error: string | null }> => {
   const isDefaultBilling = (currentState.isDefaultBilling as boolean) || false
   const isDefaultShipping = (currentState.isDefaultShipping as boolean) || false
@@ -375,7 +370,7 @@ export const addCustomerAddress = async (
 }
 
 export const deleteCustomerAddress = async (
-  addressId: string
+  addressId: string,
 ): Promise<void> => {
   const headers = {
     ...(await getAuthHeaders()),
@@ -395,7 +390,7 @@ export const deleteCustomerAddress = async (
 
 export const updateCustomerAddress = async (
   currentState: Record<string, unknown>,
-  formData: FormData
+  formData: FormData,
 ): Promise<{ success: boolean; error: string | null }> => {
   const addressId =
     (currentState.addressId as string) || (formData.get("addressId") as string)

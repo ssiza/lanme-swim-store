@@ -19,13 +19,13 @@ const Hero = ({
   const hasBackgroundImage = Boolean(backgroundImageUrl)
 
   return (
-    <section className="relative w-full overflow-hidden border-b border-ui-border-base">
+    <section className="relative w-full overflow-hidden shadow-[0_18px_45px_rgba(12,42,81,0.05)]">
       <div
         className={clx(
           "relative",
           hasBackgroundImage
             ? "min-h-[24rem] small:min-h-[28rem]"
-            : "bg-gradient-to-b from-brand-mist via-brand-mist/80 to-white"
+            : "bg-gradient-to-b from-[#fff3cf] via-brand-mist/80 to-white",
         )}
       >
         {hasBackgroundImage && (
@@ -71,7 +71,9 @@ const Hero = ({
                 </Button>
               </LocalizedClientLink>
               <LocalizedClientLink href={collectionsHref}>
-                <Button variant="secondary">{SITE_COPY.exploreCollections}</Button>
+                <Button variant="secondary">
+                  {SITE_COPY.exploreCollections}
+                </Button>
               </LocalizedClientLink>
             </div>
           </div>

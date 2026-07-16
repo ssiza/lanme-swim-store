@@ -1,7 +1,13 @@
 import { listCategories } from "@lib/data/categories"
 import { listCollections } from "@lib/data/collections"
 import { getHomepageSettings } from "@lib/data/homepage"
-import { SITE_COPY, SITE_COPYRIGHT } from "@lib/constants/site"
+import {
+  SITE_ABOUT_LINKS,
+  SITE_COPY,
+  SITE_COPYRIGHT,
+  SITE_FOOTER_ABOUT,
+  SITE_SUPPORT_LINKS,
+} from "@lib/constants/site"
 import { getCategoryPath } from "@lib/util/category-path"
 import { Text, clx } from "@modules/common/components/ui"
 import SiteLogo from "@modules/common/components/site-logo"
@@ -48,36 +54,40 @@ export default async function Footer() {
   ])
 
   const collectionsWithProducts =
-    collections?.filter((collection) => (collection.products?.length ?? 0) > 0) ??
-    []
+    collections?.filter(
+      (collection) => (collection.products?.length ?? 0) > 0,
+    ) ?? []
 
-  const about = settings.footer_about
+  const about = settings.footer_about || SITE_FOOTER_ABOUT
   const address = settings.footer_address
   const moreLinks = settings.footer_links ?? []
   const addressLines = address
-    ? address.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
+    ? address
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
     : []
 
   return (
-    <footer className="border-t border-ui-border-base w-full">
+    <footer className="w-full bg-gradient-to-b from-[#fff8eb] via-white to-white shadow-[0_-14px_36px_rgba(12,42,81,0.06)]">
       <div className="content-container flex flex-col w-full">
         <div className="flex flex-col gap-y-10 xsmall:flex-row xsmall:items-start xsmall:justify-between py-40">
-          <div className="flex max-w-sm flex-col gap-y-4">
+          <div className="flex max-w-sm flex-col gap-y-5">
             <LocalizedClientLink
               href="/"
               className="inline-block w-fit hover:opacity-90 transition-opacity"
             >
-              <SiteLogo height={28} />
+              <SiteLogo height={40} />
             </LocalizedClientLink>
 
             {about && (
-              <Text className="txt-small text-ui-fg-subtle whitespace-pre-line">
+              <Text className="txt-small text-brand-ink/75 whitespace-pre-line">
                 {about}
               </Text>
             )}
 
             {addressLines.length > 0 && (
-              <address className="not-italic txt-small text-ui-fg-subtle">
+              <address className="not-italic txt-small text-brand-ink/70">
                 {addressLines.map((line) => (
                   <span key={line} className="block">
                     {line}
@@ -87,10 +97,10 @@ export default async function Footer() {
             )}
           </div>
 
-          <div className="text-small-regular gap-10 md:gap-x-16 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="text-small-regular gap-10 md:gap-x-16 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
             {productCategories && productCategories?.length > 0 && (
               <div className="flex flex-col gap-y-2">
-                <span className="txt-small-plus txt-ui-fg-base">
+                <span className="txt-small-plus text-brand-ink">
                   Categories
                 </span>
                 <ul
@@ -111,13 +121,13 @@ export default async function Footer() {
 
                     return (
                       <li
-                        className="flex flex-col gap-2 text-ui-fg-subtle txt-small"
+                        className="flex flex-col gap-2 text-brand-ink/70 txt-small"
                         key={c.id}
                       >
                         <LocalizedClientLink
                           className={clx(
                             "hover:text-ui-fg-base",
-                            children && "txt-small-plus"
+                            children && "txt-small-plus",
                           )}
                           href={`/categories/${getCategoryPath(c)}`}
                           data-testid="category-link"
@@ -147,15 +157,15 @@ export default async function Footer() {
             )}
             {collectionsWithProducts.length > 0 && (
               <div className="flex flex-col gap-y-2">
-                <span className="txt-small-plus txt-ui-fg-base">
+                <span className="txt-small-plus text-brand-ink">
                   {SITE_COPY.collections}
                 </span>
                 <ul
                   className={clx(
-                    "grid grid-cols-1 gap-2 text-ui-fg-subtle txt-small",
+                    "grid grid-cols-1 gap-2 text-brand-ink/70 txt-small",
                     {
                       "grid-cols-2": collectionsWithProducts.length > 3,
-                    }
+                    },
                   )}
                 >
                   {collectionsWithProducts.slice(0, 6).map((c) => (
@@ -172,8 +182,10 @@ export default async function Footer() {
               </div>
             )}
             <div className="flex flex-col gap-y-2">
-              <span className="txt-small-plus txt-ui-fg-base">{SITE_COPY.shop}</span>
-              <ul className="grid grid-cols-1 gap-y-2 text-ui-fg-subtle txt-small">
+              <span className="txt-small-plus text-brand-ink">
+                {SITE_COPY.shop}
+              </span>
+              <ul className="grid grid-cols-1 gap-y-2 text-brand-ink/70 txt-small">
                 <li>
                   <LocalizedClientLink
                     className="hover:text-ui-fg-base"
@@ -200,10 +212,34 @@ export default async function Footer() {
                 </li>
               </ul>
             </div>
+            <div className="flex flex-col gap-y-2">
+              <span className="txt-small-plus text-brand-ink">Support</span>
+              <ul className="grid grid-cols-1 gap-y-2 text-brand-ink/70 txt-small">
+                {SITE_SUPPORT_LINKS.map((link) => (
+                  <li key={`${link.label}-${link.href}`}>
+                    <FooterLinkItem href={link.href}>
+                      {link.label}
+                    </FooterLinkItem>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex flex-col gap-y-2">
+              <span className="txt-small-plus text-brand-ink">About</span>
+              <ul className="grid grid-cols-1 gap-y-2 text-brand-ink/70 txt-small">
+                {SITE_ABOUT_LINKS.map((link) => (
+                  <li key={`${link.label}-${link.href}`}>
+                    <FooterLinkItem href={link.href}>
+                      {link.label}
+                    </FooterLinkItem>
+                  </li>
+                ))}
+              </ul>
+            </div>
             {moreLinks.length > 0 && (
               <div className="flex flex-col gap-y-2">
-                <span className="txt-small-plus txt-ui-fg-base">More</span>
-                <ul className="grid grid-cols-1 gap-y-2 text-ui-fg-subtle txt-small">
+                <span className="txt-small-plus text-brand-ink">More</span>
+                <ul className="grid grid-cols-1 gap-y-2 text-brand-ink/70 txt-small">
                   {moreLinks.map((link) => (
                     <li key={`${link.label}-${link.href}`}>
                       <FooterLinkItem href={link.href}>
@@ -216,7 +252,7 @@ export default async function Footer() {
             )}
           </div>
         </div>
-        <div className="flex w-full mb-16 justify-between text-ui-fg-muted">
+        <div className="flex w-full mb-16 justify-between text-brand-ink/55">
           <Text className="txt-compact-small">{SITE_COPYRIGHT}</Text>
         </div>
       </div>
