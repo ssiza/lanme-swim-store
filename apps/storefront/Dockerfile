@@ -48,7 +48,10 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 # Railway injects PORT at runtime — do not hardcode it or healthchecks will miss the server.
+# Force bind address in the start command too: orchestrators often overwrite HOSTNAME
+# with the container id, which makes Next.js listen on an unreachable name.
 ENV HOSTNAME=0.0.0.0
+ENV PORT=8080
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates \
@@ -62,4 +65,5 @@ WORKDIR /app/apps/storefront
 
 EXPOSE 8080
 
-CMD ["node", "server.js"]
+# Absolute path + HOSTNAME override so Railway startCommand / healthchecks stay reliable.
+CMD ["sh", "-c", "HOSTNAME=0.0.0.0 exec node /app/apps/storefront/server.js"]
