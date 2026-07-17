@@ -14,6 +14,7 @@ import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
 import LineItemPrice from "@modules/common/components/line-item-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import ShoppingBag from "@modules/common/icons/shopping-bag"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
@@ -83,10 +84,13 @@ const CartDropdown = ({
       <Popover className="relative h-full">
         <PopoverButton className="h-full">
           <LocalizedClientLink
-            className="hover:text-ui-fg-base"
+            className="hover:text-ui-fg-base flex items-center gap-1.5"
             href="/cart"
             data-testid="nav-cart-link"
-          >{`${SITE_COPY.bag} (${totalItems})`}</LocalizedClientLink>
+          >
+            <ShoppingBag size={18} />
+            <span>{`${SITE_COPY.bag} (${totalItems})`}</span>
+          </LocalizedClientLink>
         </PopoverButton>
         <Transition
           show={cartDropdownOpen}
