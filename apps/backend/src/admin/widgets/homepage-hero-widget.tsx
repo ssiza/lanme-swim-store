@@ -66,14 +66,17 @@ const HomepageHeroWidget = ({ data }: HomepageHeroWidgetProps) => {
         ...slide,
         sort_order: index,
       }))
-      const primaryDesktop = ordered[0]?.desktop_image_url ?? ""
+      const primaryImage =
+        ordered[0]?.desktop_image_url ||
+        ordered[0]?.mobile_image_url ||
+        ""
 
       const metadata = mergeStoreMetadata(
         data.metadata as Record<string, unknown> | null | undefined,
         {
           [HERO_SLIDES_METADATA_KEY]: serializeHeroSlides(ordered),
           // Keep legacy key in sync for older storefront builds.
-          [HERO_BACKGROUND_IMAGE_METADATA_KEY]: primaryDesktop,
+          [HERO_BACKGROUND_IMAGE_METADATA_KEY]: primaryImage,
         }
       )
 
@@ -136,7 +139,7 @@ const HomepageHeroWidget = ({ data }: HomepageHeroWidgetProps) => {
             <div className="grid gap-4 md:grid-cols-2">
               <ImageField
                 label="Desktop image"
-                hint="Full-bleed hero. Prefer landscape, high resolution."
+                hint="Landscape, ~2400×1350. If mobile is empty, this is used on phones too."
                 value={slide.desktop_image_url}
                 onChange={(url) =>
                   updateSlide(index, { desktop_image_url: url })
@@ -145,7 +148,7 @@ const HomepageHeroWidget = ({ data }: HomepageHeroWidgetProps) => {
               />
               <ImageField
                 label="Mobile image"
-                hint="Optional. Falls back to desktop when empty."
+                hint="Portrait, ~1080×1620. If desktop is empty, this is used on large screens too."
                 value={slide.mobile_image_url}
                 onChange={(url) =>
                   updateSlide(index, { mobile_image_url: url })
@@ -153,6 +156,10 @@ const HomepageHeroWidget = ({ data }: HomepageHeroWidgetProps) => {
                 disabled={isSaving}
               />
             </div>
+            <Text className="text-ui-fg-subtle text-small-regular">
+              Upload one or both. Missing side always falls back to the image
+              you provided.
+            </Text>
 
             <div className="grid gap-3 md:grid-cols-2">
               <div className="flex flex-col gap-2">

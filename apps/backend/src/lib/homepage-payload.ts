@@ -107,8 +107,17 @@ export async function buildHomepagePayload(container: MedusaContainer) {
         category.name
       )
 
-      // A cover image means show this category as a homepage banner.
-      if (!settings.cover_image_url) {
+      const cover = resolvePublicMediaUrl(
+        settings.cover_image_url,
+        backendUrl
+      )
+      const mobileCover = resolvePublicMediaUrl(
+        settings.mobile_cover_image_url,
+        backendUrl
+      )
+
+      // Desktop or mobile cover is enough (mutual fallback on the storefront).
+      if (!cover && !mobileCover) {
         return null
       }
 
@@ -118,14 +127,8 @@ export async function buildHomepagePayload(container: MedusaContainer) {
         name: category.name,
         title: settings.title ?? category.name,
         subtitle: settings.subtitle,
-        cover_image_url: resolvePublicMediaUrl(
-          settings.cover_image_url,
-          backendUrl
-        ),
-        mobile_cover_image_url: resolvePublicMediaUrl(
-          settings.mobile_cover_image_url,
-          backendUrl
-        ),
+        cover_image_url: cover ?? mobileCover,
+        mobile_cover_image_url: mobileCover ?? cover,
         display_order: settings.display_order,
         href: `/categories/${category.handle}`,
       }
@@ -139,8 +142,16 @@ export async function buildHomepagePayload(container: MedusaContainer) {
         collection.metadata as Record<string, unknown> | null | undefined
       )
 
-      const hasCover = Boolean(settings.cover_image_url)
-      // A cover image means "show this as a homepage banner".
+      const cover = resolvePublicMediaUrl(
+        settings.cover_image_url,
+        backendUrl
+      )
+      const mobile = resolvePublicMediaUrl(
+        settings.mobile_image_url,
+        backendUrl
+      )
+      const hasCover = Boolean(cover || mobile)
+      // A cover (desktop or mobile) means "show this as a homepage banner".
       const hasBanner = hasCover
 
       if (!hasBanner && !settings.show_products_on_homepage) {
@@ -149,7 +160,7 @@ export async function buildHomepagePayload(container: MedusaContainer) {
 
       const explicitlyConfigured =
         settings.featured_on_homepage ||
-        Boolean(settings.cover_image_url) ||
+        hasCover ||
         Boolean(settings.promo_headline) ||
         settings.display_order !== 0
 
@@ -159,14 +170,8 @@ export async function buildHomepagePayload(container: MedusaContainer) {
         title: collection.title,
         promo_headline: settings.promo_headline,
         description: settings.description,
-        cover_image_url: resolvePublicMediaUrl(
-          settings.cover_image_url,
-          backendUrl
-        ),
-        mobile_image_url: resolvePublicMediaUrl(
-          settings.mobile_image_url,
-          backendUrl
-        ),
+        cover_image_url: cover ?? mobile,
+        mobile_image_url: mobile ?? cover,
         cta_label: settings.cta_label,
         cta_href: settings.cta_href ?? `/collections/${collection.handle}`,
         display_order: settings.display_order,

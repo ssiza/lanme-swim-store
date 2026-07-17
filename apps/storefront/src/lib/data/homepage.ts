@@ -197,6 +197,7 @@ export const getHomepageSettings = async (): Promise<HomepageSettings> => {
         fetchUrl,
         hasHeroImage: Boolean(
           normalized.hero_slides[0]?.desktop_image_url ||
+            normalized.hero_slides[0]?.mobile_image_url ||
             normalized.hero_background_image_url
         ),
         slideCount: normalized.hero_slides.length,

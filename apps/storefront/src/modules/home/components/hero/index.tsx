@@ -1,5 +1,6 @@
 import { SITE_NAME } from "@lib/constants/site"
 import type { HomepageHeroSlide } from "@lib/data/homepage"
+import { resolveResponsiveImagePair } from "@lib/util/responsive-image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import EditorialImage from "@modules/common/components/editorial-image"
 import { clx } from "@modules/common/components/ui"
@@ -31,8 +32,11 @@ const Hero = ({
         }
       : null)
 
-  const imageUrl = slide?.desktop_image_url
-  const hasImage = Boolean(imageUrl)
+  const imagePair = resolveResponsiveImagePair(
+    slide?.desktop_image_url,
+    slide?.mobile_image_url
+  )
+  const hasImage = Boolean(imagePair)
   const headline = slide?.headline?.trim() || SITE_NAME
   const subheadline = slide?.subheadline?.trim() || null
   const ctaLabel = slide?.cta_label?.trim() || "Shop resort"
@@ -46,11 +50,11 @@ const Hero = ({
           !hasImage && "bg-brand-mist"
         )}
       >
-        {hasImage && imageUrl ? (
+        {imagePair ? (
           <>
             <EditorialImage
-              desktopSrc={imageUrl}
-              mobileSrc={slide?.mobile_image_url}
+              desktopSrc={imagePair.desktop}
+              mobileSrc={imagePair.mobile}
               alt=""
               priority
             />
@@ -94,7 +98,7 @@ const Hero = ({
               className={clx(
                 "inline-flex items-center justify-center px-7 py-3 text-sm font-medium tracking-wide transition-colors duration-300",
                 hasImage
-                  ? "border border-white/80 bg-white/10 text-white backdrop-blur-[2px] hover:bg-white hover:text-brand-ink"
+                  ? "border border-white/80 bg-white/10 text-white backdrop-blur-[2px] transition-colors hover:bg-white hover:text-brand-ink"
                   : "border border-brand-ink bg-brand-ink text-white hover:bg-transparent hover:text-brand-ink"
               )}
             >

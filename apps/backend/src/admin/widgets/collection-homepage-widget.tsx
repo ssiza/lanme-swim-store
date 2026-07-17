@@ -138,14 +138,15 @@ const CollectionHomepageWidget = ({ data }: CollectionHomepageWidgetProps) => {
 
         <div className="grid gap-4 md:grid-cols-2">
           <ImageField
-            label="Cover image"
+            label="Cover image (desktop)"
+            hint="Landscape. Used on mobile too if no mobile image is set."
             value={coverImageUrl}
             onChange={setCoverImageUrl}
             disabled={isSaving}
           />
           <ImageField
             label="Mobile image"
-            hint="Optional. Falls back to cover image."
+            hint="Portrait. Used on desktop too if no desktop image is set."
             value={mobileImageUrl}
             onChange={setMobileImageUrl}
             disabled={isSaving}

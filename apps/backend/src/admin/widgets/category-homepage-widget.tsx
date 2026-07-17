@@ -138,15 +138,15 @@ const CategoryHomepageWidget = ({ data }: CategoryHomepageWidgetProps) => {
 
         <div className="grid gap-4 md:grid-cols-2">
           <ImageField
-            label="Cover image"
-            hint="Desktop / full-width banner."
+            label="Cover image (desktop)"
+            hint="Landscape banner. Used on mobile too if no mobile image is set."
             value={coverImageUrl}
             onChange={setCoverImageUrl}
             disabled={isSaving}
           />
           <ImageField
             label="Mobile cover image"
-            hint="Optional. Falls back to cover image."
+            hint="Portrait banner. Used on desktop too if no desktop image is set."
             value={mobileCoverImageUrl}
             onChange={setMobileCoverImageUrl}
             disabled={isSaving}

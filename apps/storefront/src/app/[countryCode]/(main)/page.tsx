@@ -49,6 +49,7 @@ export default async function Home(props: {
     categoryBanners: homepageSettings.featured_categories.length,
     hasHeroImage: Boolean(
       homepageSettings.hero_slides[0]?.desktop_image_url ||
+        homepageSettings.hero_slides[0]?.mobile_image_url ||
         homepageSettings.hero_background_image_url
     ),
   })

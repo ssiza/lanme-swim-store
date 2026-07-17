@@ -75,8 +75,9 @@ const Homepage = ({
 
       {orderedBlocks.map((block, index) => {
         const collection = byId.get(block.id)
-        const showBanner =
-          block.featured_on_homepage && Boolean(block.cover_image_url)
+        const showBanner = Boolean(
+          block.cover_image_url || block.mobile_image_url
+        )
 
         return (
           <div key={block.id} className="flex flex-col">
@@ -84,7 +85,7 @@ const Homepage = ({
               <ImageBanner
                 title={block.promo_headline || block.title}
                 description={block.description}
-                desktopImage={block.cover_image_url!}
+                desktopImage={block.cover_image_url}
                 mobileImage={block.mobile_image_url}
                 href={block.cta_href || `/collections/${block.handle}`}
                 ctaLabel={block.cta_label || "Shop the edit"}

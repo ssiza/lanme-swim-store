@@ -1,7 +1,8 @@
+import { resolveResponsiveImagePair } from "@lib/util/responsive-image"
 import { clx } from "@modules/common/components/ui"
 
 type EditorialImageProps = {
-  desktopSrc: string
+  desktopSrc?: string | null
   mobileSrc?: string | null
   alt: string
   priority?: boolean
@@ -10,19 +11,23 @@ type EditorialImageProps = {
 }
 
 /**
- * Full-bleed CMS photography.
- * Uses native <img> (not next/image) so S3 / Medusa upload hosts are never
- * blocked by remotePatterns, while still supporting lazy-load + art direction.
+ * Full-bleed CMS photography with desktop/mobile art direction.
+ * Either image is enough — the missing viewport falls back to the other.
  */
 const EditorialImage = ({
-  desktopSrc,
+  desktopSrc = null,
   mobileSrc = null,
   alt,
   priority = false,
   className,
   imageClassName,
 }: EditorialImageProps) => {
-  const mobile = mobileSrc || desktopSrc
+  const pair = resolveResponsiveImagePair(desktopSrc, mobileSrc)
+
+  if (!pair) {
+    return null
+  }
+
   const shared = clx(
     "absolute inset-0 h-full w-full object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-[1.03]",
     imageClassName
@@ -32,7 +37,7 @@ const EditorialImage = ({
     <div className={clx("absolute inset-0 overflow-hidden", className)}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={mobile}
+        src={pair.mobile}
         alt={alt}
         className={clx(shared, "small:hidden")}
         loading={priority ? "eager" : "lazy"}
@@ -41,7 +46,7 @@ const EditorialImage = ({
       />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={desktopSrc}
+        src={pair.desktop}
         alt={alt}
         className={clx(shared, "hidden small:block")}
         loading={priority ? "eager" : "lazy"}

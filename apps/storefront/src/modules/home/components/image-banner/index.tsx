@@ -1,3 +1,4 @@
+import { resolveResponsiveImagePair } from "@lib/util/responsive-image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import EditorialImage from "@modules/common/components/editorial-image"
 import Reveal from "@modules/common/components/reveal"
@@ -7,7 +8,7 @@ type ImageBannerProps = {
   title: string
   subtitle?: string | null
   description?: string | null
-  desktopImage: string
+  desktopImage?: string | null
   mobileImage?: string | null
   ctaLabel?: string | null
   href: string
@@ -21,7 +22,7 @@ const ImageBanner = ({
   title,
   subtitle = null,
   description = null,
-  desktopImage,
+  desktopImage = null,
   mobileImage = null,
   ctaLabel = "Explore",
   href,
@@ -29,6 +30,12 @@ const ImageBanner = ({
   align = "left",
   priority = false,
 }: ImageBannerProps) => {
+  const imagePair = resolveResponsiveImagePair(desktopImage, mobileImage)
+
+  if (!imagePair) {
+    return null
+  }
+
   return (
     <Reveal>
       <section className="relative w-full overflow-hidden">
@@ -42,8 +49,8 @@ const ImageBanner = ({
           )}
         >
           <EditorialImage
-            desktopSrc={desktopImage}
-            mobileSrc={mobileImage}
+            desktopSrc={imagePair.desktop}
+            mobileSrc={imagePair.mobile}
             alt={title}
             priority={priority}
           />
