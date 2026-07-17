@@ -67,3 +67,24 @@ export const resolveFallbackCountry = (
 
   return DEFAULT_COUNTRY_CODE
 }
+
+/**
+ * Whether the request path already has an acceptable country prefix and should
+ * NOT redirect. When the region map is empty (backend/key failure), allow the
+ * fallback country through so we never 307 to the same URL forever.
+ */
+export const hasAcceptableCountryPrefix = (
+  pathCountry: string | undefined,
+  resolvedCountry: string,
+  regionMap: Map<string, unknown>
+): boolean => {
+  if (!pathCountry || pathCountry !== resolvedCountry.toLowerCase()) {
+    return false
+  }
+
+  if (regionMap.size === 0) {
+    return true
+  }
+
+  return regionMap.has(pathCountry)
+}

@@ -546,6 +546,12 @@ npm run railway:migrate:backend
 - The start command must force `HOSTNAME=0.0.0.0` — Railway often overwrites `HOSTNAME` with the container id, and Next.js then binds to an unreachable name.
 - Confirm every `NEXT_PUBLIC_*` variable has **Available at Build Time** enabled, then **Redeploy** (not just restart) so the image is rebuilt.
 
+**`ERR_TOO_MANY_REDIRECTS` on the storefront**
+
+- Usually means Medusa `/store/regions` failed (invalid/missing `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`) so the country middleware had an empty region map.
+- Check `GET /api/ready` on the storefront — it reports the backend error.
+- Fix: copy a valid publishable key from Medusa Admin → Settings → Publishable API Keys into the storefront service, enable **Available at Build Time**, redeploy.
+
 ### Local production scripts
 
 ```bash
