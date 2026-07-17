@@ -55,12 +55,28 @@ export default async function Footer() {
 
   const collectionsWithProducts =
     collections?.filter(
-      (collection) => (collection.products?.length ?? 0) > 0,
+      (collection) => (collection.products?.length ?? 0) > 0
     ) ?? []
 
-  const about = settings.footer_about || SITE_FOOTER_ABOUT
-  const address = settings.footer_address
+  // Once admin has saved footer settings, CMS wins completely — no hardcoded
+  // about blurb or link columns. Defaults only apply before first save.
+  const cmsConfigured = settings.footer_configured
+  const about = cmsConfigured
+    ? settings.footer_about?.trim() || null
+    : settings.footer_about?.trim() || SITE_FOOTER_ABOUT
+  const address = settings.footer_address?.trim() || null
+  const supportLinks = cmsConfigured
+    ? settings.footer_support_links
+    : settings.footer_support_links.length > 0
+      ? settings.footer_support_links
+      : [...SITE_SUPPORT_LINKS]
+  const aboutLinks = cmsConfigured
+    ? settings.footer_about_links
+    : settings.footer_about_links.length > 0
+      ? settings.footer_about_links
+      : [...SITE_ABOUT_LINKS]
   const moreLinks = settings.footer_links ?? []
+
   const addressLines = address
     ? address
         .split(/\r?\n/)
@@ -80,13 +96,13 @@ export default async function Footer() {
               <SiteLogo height={40} />
             </LocalizedClientLink>
 
-            {about && (
+            {about ? (
               <Text className="txt-small text-brand-ink/75 whitespace-pre-line">
                 {about}
               </Text>
-            )}
+            ) : null}
 
-            {addressLines.length > 0 && (
+            {addressLines.length > 0 ? (
               <address className="not-italic txt-small text-brand-ink/70">
                 {addressLines.map((line) => (
                   <span key={line} className="block">
@@ -94,7 +110,7 @@ export default async function Footer() {
                   </span>
                 ))}
               </address>
-            )}
+            ) : null}
           </div>
 
           <div className="text-small-regular gap-10 md:gap-x-16 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
@@ -127,7 +143,7 @@ export default async function Footer() {
                         <LocalizedClientLink
                           className={clx(
                             "hover:text-ui-fg-base",
-                            children && "txt-small-plus",
+                            children && "txt-small-plus"
                           )}
                           href={`/categories/${getCategoryPath(c)}`}
                           data-testid="category-link"
@@ -165,7 +181,7 @@ export default async function Footer() {
                     "grid grid-cols-1 gap-2 text-brand-ink/70 txt-small",
                     {
                       "grid-cols-2": collectionsWithProducts.length > 3,
-                    },
+                    }
                   )}
                 >
                   {collectionsWithProducts.slice(0, 6).map((c) => (
@@ -212,30 +228,34 @@ export default async function Footer() {
                 </li>
               </ul>
             </div>
-            <div className="flex flex-col gap-y-2">
-              <span className="txt-small-plus text-brand-ink">Support</span>
-              <ul className="grid grid-cols-1 gap-y-2 text-brand-ink/70 txt-small">
-                {SITE_SUPPORT_LINKS.map((link) => (
-                  <li key={`${link.label}-${link.href}`}>
-                    <FooterLinkItem href={link.href}>
-                      {link.label}
-                    </FooterLinkItem>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="flex flex-col gap-y-2">
-              <span className="txt-small-plus text-brand-ink">About</span>
-              <ul className="grid grid-cols-1 gap-y-2 text-brand-ink/70 txt-small">
-                {SITE_ABOUT_LINKS.map((link) => (
-                  <li key={`${link.label}-${link.href}`}>
-                    <FooterLinkItem href={link.href}>
-                      {link.label}
-                    </FooterLinkItem>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {supportLinks.length > 0 ? (
+              <div className="flex flex-col gap-y-2">
+                <span className="txt-small-plus text-brand-ink">Support</span>
+                <ul className="grid grid-cols-1 gap-y-2 text-brand-ink/70 txt-small">
+                  {supportLinks.map((link) => (
+                    <li key={`${link.label}-${link.href}`}>
+                      <FooterLinkItem href={link.href}>
+                        {link.label}
+                      </FooterLinkItem>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {aboutLinks.length > 0 ? (
+              <div className="flex flex-col gap-y-2">
+                <span className="txt-small-plus text-brand-ink">About</span>
+                <ul className="grid grid-cols-1 gap-y-2 text-brand-ink/70 txt-small">
+                  {aboutLinks.map((link) => (
+                    <li key={`${link.label}-${link.href}`}>
+                      <FooterLinkItem href={link.href}>
+                        {link.label}
+                      </FooterLinkItem>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
             {moreLinks.length > 0 && (
               <div className="flex flex-col gap-y-2">
                 <span className="txt-small-plus text-brand-ink">More</span>

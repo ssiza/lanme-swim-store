@@ -12,6 +12,7 @@ import {
 } from "@medusajs/ui"
 import { useState } from "react"
 import ImageField from "../components/image-field"
+import { mergeStoreMetadata } from "../../lib/footer-settings"
 import {
   HERO_BACKGROUND_IMAGE_METADATA_KEY,
   HERO_SLIDES_METADATA_KEY,
@@ -67,19 +68,22 @@ const HomepageHeroWidget = ({ data }: HomepageHeroWidgetProps) => {
       }))
       const primaryDesktop = ordered[0]?.desktop_image_url ?? ""
 
+      const metadata = mergeStoreMetadata(
+        data.metadata as Record<string, unknown> | null | undefined,
+        {
+          [HERO_SLIDES_METADATA_KEY]: serializeHeroSlides(ordered),
+          // Keep legacy key in sync for older storefront builds.
+          [HERO_BACKGROUND_IMAGE_METADATA_KEY]: primaryDesktop,
+        }
+      )
+
       const response = await fetch(`/admin/stores/${data.id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({
-          metadata: {
-            [HERO_SLIDES_METADATA_KEY]: serializeHeroSlides(ordered),
-            // Keep legacy key in sync for older storefront builds.
-            [HERO_BACKGROUND_IMAGE_METADATA_KEY]: primaryDesktop,
-          },
-        }),
+        body: JSON.stringify({ metadata }),
       })
 
       if (!response.ok) {

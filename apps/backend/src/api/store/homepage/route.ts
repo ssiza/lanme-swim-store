@@ -5,24 +5,52 @@ import { getCollectionHomepageSettings } from "../../../lib/collection-homepage-
 import { getFooterSettings } from "../../../lib/footer-settings"
 import { getHomepageHeroSettings } from "../../../lib/homepage-settings"
 
+async function safeGraphQuery<T>(
+  query: {
+    graph: (args: Record<string, unknown>) => Promise<{ data: T[] }>
+  },
+  args: Record<string, unknown>
+): Promise<T[]> {
+  try {
+    const { data } = await query.graph(args)
+    return data ?? []
+  } catch {
+    return []
+  }
+}
+
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
 
-  const [{ data: stores }, { data: categories }, { data: collections }] =
-    await Promise.all([
-      query.graph({
-        entity: "store",
-        fields: ["metadata"],
-      }),
-      query.graph({
-        entity: "product_category",
-        fields: ["id", "name", "handle", "metadata", "rank"],
-      }),
-      query.graph({
-        entity: "product_collection",
-        fields: ["id", "title", "handle", "metadata"],
-      }),
-    ])
+  // Store metadata is required for footer/hero — query it alone first so a
+  // category/collection graph failure cannot blank the entire homepage CMS.
+  const stores = await safeGraphQuery<{
+    metadata?: Record<string, unknown> | null
+  }>(query, {
+    entity: "store",
+    fields: ["metadata"],
+  })
+
+  const [categories, collections] = await Promise.all([
+    safeGraphQuery<{
+      id: string
+      name: string
+      handle: string
+      metadata?: Record<string, unknown> | null
+    }>(query, {
+      entity: "product_category",
+      fields: ["id", "name", "handle", "metadata", "rank"],
+    }),
+    safeGraphQuery<{
+      id: string
+      title: string
+      handle: string
+      metadata?: Record<string, unknown> | null
+    }>(query, {
+      entity: "product_collection",
+      fields: ["id", "title", "handle", "metadata"],
+    }),
+  ])
 
   const store = stores?.[0]
   const metadata = store?.metadata as Record<string, unknown> | null | undefined
@@ -68,8 +96,6 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
         return null
       }
 
-      // When nothing is configured for homepage, keep legacy behavior:
-      // collections still eligible for product rails via show_products default.
       const explicitlyConfigured =
         settings.featured_on_homepage ||
         Boolean(settings.cover_image_url) ||
@@ -85,8 +111,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
         cover_image_url: settings.cover_image_url,
         mobile_image_url: settings.mobile_image_url,
         cta_label: settings.cta_label,
-        cta_href:
-          settings.cta_href ?? `/collections/${collection.handle}`,
+        cta_href: settings.cta_href ?? `/collections/${collection.handle}`,
         display_order: settings.display_order,
         featured_on_homepage: hasBanner,
         show_products_on_homepage: settings.show_products_on_homepage,
@@ -104,5 +129,8 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     footer_about: footer.about,
     footer_address: footer.address,
     footer_links: footer.links,
+    footer_support_links: footer.support_links,
+    footer_about_links: footer.about_links,
+    footer_configured: footer.configured,
   })
 }

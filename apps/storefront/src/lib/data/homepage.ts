@@ -50,6 +50,11 @@ export type HomepageCollectionBlock = {
   explicitly_configured?: boolean
 }
 
+export type HomepageFooterLink = {
+  label: string
+  href: string
+}
+
 export type HomepageSettings = {
   hero_background_image_url: string | null
   hero_slides: HomepageHeroSlide[]
@@ -57,7 +62,10 @@ export type HomepageSettings = {
   featured_collections: HomepageCollectionBlock[]
   footer_about: string | null
   footer_address: string | null
-  footer_links: Array<{ label: string; href: string }>
+  footer_links: HomepageFooterLink[]
+  footer_support_links: HomepageFooterLink[]
+  footer_about_links: HomepageFooterLink[]
+  footer_configured: boolean
 }
 
 const EMPTY_SETTINGS: HomepageSettings = {
@@ -68,6 +76,9 @@ const EMPTY_SETTINGS: HomepageSettings = {
   footer_about: null,
   footer_address: null,
   footer_links: [],
+  footer_support_links: [],
+  footer_about_links: [],
+  footer_configured: false,
 }
 
 export const getHomepageSettings = async (): Promise<HomepageSettings> => {
@@ -94,7 +105,6 @@ export const getHomepageSettings = async (): Promise<HomepageSettings> => {
       ? settings.hero_slides
       : []
 
-    // Legacy single-image fallback when slides array is empty.
     if (
       hero_slides.length === 0 &&
       typeof settings.hero_background_image_url === "string" &&
@@ -129,6 +139,7 @@ export const getHomepageSettings = async (): Promise<HomepageSettings> => {
       categoryBannerCount: settings.featured_categories?.length ?? 0,
       collectionBlockCount: settings.featured_collections?.length ?? 0,
       hasFooterAbout: Boolean(settings.footer_about),
+      footerConfigured: Boolean(settings.footer_configured),
     })
 
     return {
@@ -144,6 +155,20 @@ export const getHomepageSettings = async (): Promise<HomepageSettings> => {
       footer_links: Array.isArray(settings.footer_links)
         ? settings.footer_links
         : [],
+      footer_support_links: Array.isArray(settings.footer_support_links)
+        ? settings.footer_support_links
+        : [],
+      footer_about_links: Array.isArray(settings.footer_about_links)
+        ? settings.footer_about_links
+        : [],
+      footer_configured: Boolean(settings.footer_configured),
+      // Preserve empty-string about/address from CMS (do not coalesce away).
+      footer_about:
+        typeof settings.footer_about === "string" ? settings.footer_about : null,
+      footer_address:
+        typeof settings.footer_address === "string"
+          ? settings.footer_address
+          : null,
     }
   } catch (error) {
     logFetchError("getHomepageSettings", error)
