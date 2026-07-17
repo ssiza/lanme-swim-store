@@ -1,171 +1,209 @@
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
+import { Plus, Trash } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Button, Container, Heading, Text, toast } from "@medusajs/ui"
+import {
+  Button,
+  Container,
+  Heading,
+  Input,
+  Label,
+  Text,
+  toast,
+} from "@medusajs/ui"
 import { useState } from "react"
-import { compressImageForUpload } from "../lib/compress-image-for-upload"
-import { HERO_BACKGROUND_IMAGE_METADATA_KEY } from "../../lib/homepage-settings"
-
-async function readUploadError(response: Response): Promise<string> {
-  try {
-    const body = (await response.json()) as { message?: string; type?: string }
-    if (body?.message) {
-      return body.message
-    }
-  } catch {
-    // ignore JSON parse errors
-  }
-
-  return `Upload failed (${response.status})`
-}
+import ImageField from "../components/image-field"
+import {
+  HERO_BACKGROUND_IMAGE_METADATA_KEY,
+  HERO_SLIDES_METADATA_KEY,
+  createEmptyHeroSlide,
+  getHeroSlides,
+  serializeHeroSlides,
+  type HeroSlide,
+} from "../../lib/homepage-settings"
 
 type HomepageHeroWidgetProps = {
   data: HttpTypes.AdminStore
 }
 
 const HomepageHeroWidget = ({ data }: HomepageHeroWidgetProps) => {
-  const currentUrl =
-    typeof data.metadata?.[HERO_BACKGROUND_IMAGE_METADATA_KEY] === "string"
-      ? (data.metadata[HERO_BACKGROUND_IMAGE_METADATA_KEY] as string)
-      : null
+  const initialSlides = getHeroSlides(
+    data.metadata as Record<string, unknown> | null | undefined
+  )
 
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentUrl)
-  const [isUploading, setIsUploading] = useState(false)
-  const [isRemoving, setIsRemoving] = useState(false)
+  const [slides, setSlides] = useState<HeroSlide[]>(
+    initialSlides.length > 0 ? initialSlides : [createEmptyHeroSlide(0)]
+  )
+  const [isSaving, setIsSaving] = useState(false)
 
-  const updateHeroImage = async (url: string | null) => {
-    const response = await fetch(`/admin/stores/${data.id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        metadata: {
-          [HERO_BACKGROUND_IMAGE_METADATA_KEY]: url ?? "",
-        },
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error("Failed to update homepage hero image")
-    }
-
-    setPreviewUrl(url)
+  const updateSlide = (index: number, patch: Partial<HeroSlide>) => {
+    setSlides((current) =>
+      current.map((slide, i) => (i === index ? { ...slide, ...patch } : slide))
+    )
   }
 
-  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+  const addSlide = () => {
+    setSlides((current) => [
+      ...current,
+      createEmptyHeroSlide(current.length),
+    ])
+  }
 
-    if (!file) {
-      return
-    }
+  const removeSlide = (index: number) => {
+    setSlides((current) => {
+      const next = current.filter((_, i) => i !== index)
+      return next.length > 0
+        ? next.map((slide, i) => ({ ...slide, sort_order: i }))
+        : [createEmptyHeroSlide(0)]
+    })
+  }
 
-    setIsUploading(true)
+  const handleSave = async () => {
+    setIsSaving(true)
 
     try {
-      const fileToUpload = await compressImageForUpload(file)
-      const formData = new FormData()
-      formData.append("files", fileToUpload)
+      const ordered = slides.map((slide, index) => ({
+        ...slide,
+        sort_order: index,
+      }))
+      const primaryDesktop = ordered[0]?.desktop_image_url ?? ""
 
-      const uploadResponse = await fetch("/admin/uploads", {
+      const response = await fetch(`/admin/stores/${data.id}`, {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
+        body: JSON.stringify({
+          metadata: {
+            [HERO_SLIDES_METADATA_KEY]: serializeHeroSlides(ordered),
+            // Keep legacy key in sync for older storefront builds.
+            [HERO_BACKGROUND_IMAGE_METADATA_KEY]: primaryDesktop,
+          },
+        }),
       })
 
-      if (!uploadResponse.ok) {
-        throw new Error(await readUploadError(uploadResponse))
+      if (!response.ok) {
+        throw new Error("Failed to update homepage hero")
       }
 
-      const { files } = (await uploadResponse.json()) as {
-        files: { url: string }[]
-      }
-
-      const uploadedUrl = files?.[0]?.url
-
-      if (!uploadedUrl) {
-        throw new Error("Upload did not return an image URL")
-      }
-
-      await updateHeroImage(uploadedUrl)
-      toast.success("Homepage hero background updated")
+      toast.success("Homepage hero saved")
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to upload hero image"
+        error instanceof Error ? error.message : "Failed to save homepage hero"
       )
     } finally {
-      setIsUploading(false)
-      event.target.value = ""
-    }
-  }
-
-  const handleRemove = async () => {
-    setIsRemoving(true)
-
-    try {
-      await updateHeroImage(null)
-      toast.success("Homepage hero background removed")
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to remove hero image"
-      )
-    } finally {
-      setIsRemoving(false)
+      setIsSaving(false)
     }
   }
 
   return (
     <Container className="divide-y p-0">
-      <div className="flex flex-col gap-4 px-6 py-4">
+      <div className="flex items-center justify-between gap-4 px-6 py-4">
         <div>
-          <Heading level="h2">Homepage Hero Background</Heading>
+          <Heading level="h2">Homepage Hero</Heading>
           <Text className="text-ui-fg-subtle text-small-regular mt-1">
-            Upload a background image for the storefront homepage hero. Large
-            images are resized automatically before upload. A dark overlay is
-            applied on the storefront so text stays readable.
+            Photography-first hero for the storefront. Multiple slides are
+            supported for future carousels — the first slide is shown today.
           </Text>
         </div>
+        <Button size="small" onClick={handleSave} isLoading={isSaving}>
+          Save
+        </Button>
+      </div>
 
-        {previewUrl ? (
-          <div className="overflow-hidden rounded-lg border border-ui-border-base">
-            <img
-              src={previewUrl}
-              alt="Homepage hero background preview"
-              className="h-40 w-full object-cover"
-            />
-          </div>
-        ) : (
-          <div className="flex h-40 items-center justify-center rounded-lg border border-dashed border-ui-border-base bg-ui-bg-subtle">
-            <Text className="text-ui-fg-subtle text-small-regular">
-              No hero background image set
-            </Text>
-          </div>
-        )}
+      <div className="flex flex-col gap-6 px-6 py-4">
+        {slides.map((slide, index) => (
+          <div
+            key={slide.id}
+            className="flex flex-col gap-4 rounded-lg border border-ui-border-base p-4"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <Text className="txt-compact-small-plus">Slide {index + 1}</Text>
+              <Button
+                variant="transparent"
+                size="small"
+                onClick={() => removeSlide(index)}
+                disabled={slides.length === 1}
+              >
+                <Trash />
+              </Button>
+            </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" size="small" disabled={isUploading} asChild>
-            <label className="cursor-pointer">
-              {isUploading ? "Uploading..." : "Upload image"}
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleUpload}
-                disabled={isUploading}
+            <div className="grid gap-4 md:grid-cols-2">
+              <ImageField
+                label="Desktop image"
+                hint="Full-bleed hero. Prefer landscape, high resolution."
+                value={slide.desktop_image_url}
+                onChange={(url) =>
+                  updateSlide(index, { desktop_image_url: url })
+                }
+                disabled={isSaving}
               />
-            </label>
-          </Button>
+              <ImageField
+                label="Mobile image"
+                hint="Optional. Falls back to desktop when empty."
+                value={slide.mobile_image_url}
+                onChange={(url) =>
+                  updateSlide(index, { mobile_image_url: url })
+                }
+                disabled={isSaving}
+              />
+            </div>
 
-          {previewUrl && (
-            <Button
-              variant="secondary"
-              size="small"
-              onClick={handleRemove}
-              disabled={isRemoving}
-            >
-              {isRemoving ? "Removing..." : "Remove image"}
-            </Button>
-          )}
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor={`hero-headline-${slide.id}`}>Headline</Label>
+                <Input
+                  id={`hero-headline-${slide.id}`}
+                  value={slide.headline ?? ""}
+                  onChange={(e) =>
+                    updateSlide(index, { headline: e.target.value })
+                  }
+                  placeholder="Made for the heat."
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor={`hero-sub-${slide.id}`}>Subheadline</Label>
+                <Input
+                  id={`hero-sub-${slide.id}`}
+                  value={slide.subheadline ?? ""}
+                  onChange={(e) =>
+                    updateSlide(index, { subheadline: e.target.value })
+                  }
+                  placeholder="Resort swimwear, quietly elevated."
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor={`hero-cta-label-${slide.id}`}>CTA label</Label>
+                <Input
+                  id={`hero-cta-label-${slide.id}`}
+                  value={slide.cta_label ?? ""}
+                  onChange={(e) =>
+                    updateSlide(index, { cta_label: e.target.value })
+                  }
+                  placeholder="Shop resort"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor={`hero-cta-href-${slide.id}`}>CTA link</Label>
+                <Input
+                  id={`hero-cta-href-${slide.id}`}
+                  value={slide.cta_href ?? ""}
+                  onChange={(e) =>
+                    updateSlide(index, { cta_href: e.target.value })
+                  }
+                  placeholder="/store"
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+
+        <div>
+          <Button variant="secondary" size="small" onClick={addSlide}>
+            <Plus />
+            Add slide
+          </Button>
         </div>
       </div>
     </Container>

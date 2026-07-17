@@ -126,3 +126,9 @@
     @apply text-[32px] leading-[44px] font-semibold;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .group:hover img {
+    transform: none !important;
+  }
+}

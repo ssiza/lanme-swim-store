@@ -142,6 +142,18 @@ You can slo run the following command from the root to start both backend and st
 pnpm dev
 ```
 
+## Homepage CMS (admin-managed)
+
+The storefront homepage is photography-first and fully driven from Medusa Admin — nothing is hardcoded for hero/collection/category banners.
+
+| Where in Admin | What you configure |
+|----------------|--------------------|
+| **Settings → Store → Homepage Hero** | Desktop/mobile images, headline, subheadline, CTA (+ multi-slide ready) |
+| **Products → Categories → Homepage Banner** | Cover / mobile cover, title, subtitle, display order, featured toggle |
+| **Products → Collections → Homepage Promotion** | Cover / mobile image, promo headline, description, CTA, order, banner + product-rail toggles |
+
+`GET /store/homepage` returns hero slides, featured category banners, and collection blocks. Images upload through Medusa’s upload API (S3 in production).
+
 ## Configuration
 
 The storefront is configured via environment variables in `apps/storefront/.env.local`:

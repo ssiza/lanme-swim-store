@@ -1,9 +1,9 @@
 import { Metadata } from "next"
 
-import FeaturedProducts from "@modules/home/components/featured-products"
+import Homepage from "@modules/home/components/homepage"
 import Hero from "@modules/home/components/hero"
 import EmptyProducts from "@modules/store/components/empty-products"
-import { SITE_COPY, SITE_DESCRIPTION, SITE_NAME } from "@lib/constants/site"
+import { SITE_DESCRIPTION, SITE_NAME } from "@lib/constants/site"
 import { getDefaultCountryCode } from "@lib/constants/region"
 import { getHomepageSettings } from "@lib/data/homepage"
 import { listCollections } from "@lib/data/collections"
@@ -32,12 +32,11 @@ export default async function Home(props: {
 
   const region = await getRegion(countryCode)
 
-  const { collections: allCollections } = await listCollections(
-    { fields: "id, handle, title" },
-    route
-  )
-
-  const homepageSettings = await getHomepageSettings()
+  const [{ collections: allCollections }, homepageSettings] =
+    await Promise.all([
+      listCollections({ fields: "id, handle, title" }, route),
+      getHomepageSettings(),
+    ])
 
   const collections = region
     ? await filterCollectionsWithProducts(allCollections ?? [], countryCode)
@@ -48,38 +47,21 @@ export default async function Home(props: {
     hasRegion: Boolean(region),
     collectionCount: collections.length,
     totalCollections: allCollections?.length ?? 0,
+    heroSlides: homepageSettings.hero_slides.length,
+    categoryBanners: homepageSettings.featured_categories.length,
   })
-
-  const collectionsHref = "/collections"
 
   if (!region) {
     return (
       <>
         <Hero
-          collectionsHref={collectionsHref}
+          slides={homepageSettings.hero_slides}
           backgroundImageUrl={homepageSettings.hero_background_image_url}
         />
         <div className="content-container py-12">
           <EmptyProducts
             title="Welcome to Lanmè Swim"
-            description={`We could not load products for this region. Try /${getDefaultCountryCode()}/store to continue shopping.`}
-          />
-        </div>
-      </>
-    )
-  }
-
-  if (!collections.length) {
-    return (
-      <>
-        <Hero
-          collectionsHref={collectionsHref}
-          backgroundImageUrl={homepageSettings.hero_background_image_url}
-        />
-        <div className="content-container py-12">
-          <EmptyProducts
-            title={SITE_COPY.emptyCatalogTitle}
-            description="Browse all swimwear while collections are being set up."
+            description={`We could not load products for this region. Visit /${getDefaultCountryCode()}/store to continue.`}
           />
         </div>
       </>
@@ -87,20 +69,11 @@ export default async function Home(props: {
   }
 
   return (
-    <>
-      <Hero
-        collectionsHref={collectionsHref}
-        backgroundImageUrl={homepageSettings.hero_background_image_url}
-      />
-      <div className="py-12">
-        <ul className="flex flex-col gap-x-6">
-          <FeaturedProducts
-            collections={collections}
-            region={region}
-            countryCode={countryCode}
-          />
-        </ul>
-      </div>
-    </>
+    <Homepage
+      settings={homepageSettings}
+      collections={collections}
+      region={region}
+      countryCode={countryCode}
+    />
   )
 }

@@ -37,6 +37,9 @@ module.exports = {
           ink: "#14212B",
           sea: "#1B5F6E",
           mist: "#E8F1F3",
+          salt: "#F4F1EC",
+          sand: "#C8B8A4",
+          tide: "#2C3A3D",
         },
       },
       borderRadius: {
