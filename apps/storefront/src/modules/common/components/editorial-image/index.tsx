@@ -1,56 +1,57 @@
-"use client"
-
+import { resolveResponsiveImagePair } from "@lib/util/responsive-image"
 import { clx } from "@modules/common/components/ui"
-import Image from "next/image"
 
 type EditorialImageProps = {
-  desktopSrc: string
+  desktopSrc?: string | null
   mobileSrc?: string | null
   alt: string
   priority?: boolean
   className?: string
   imageClassName?: string
-  sizes?: string
 }
 
 /**
- * Full-bleed responsive photography with subtle hover zoom.
- * Desktop/mobile art-direction via CSS visibility (avoids layout shift).
+ * Full-bleed CMS photography with desktop/mobile art direction.
+ * Either image is enough — the missing viewport falls back to the other.
  */
 const EditorialImage = ({
-  desktopSrc,
+  desktopSrc = null,
   mobileSrc = null,
   alt,
   priority = false,
   className,
   imageClassName,
-  sizes = "100vw",
 }: EditorialImageProps) => {
-  const mobile = mobileSrc || desktopSrc
+  const pair = resolveResponsiveImagePair(desktopSrc, mobileSrc)
+
+  if (!pair) {
+    return null
+  }
+
   const shared = clx(
-    "object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-[1.03]",
+    "absolute inset-0 h-full w-full object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-[1.03]",
     imageClassName
   )
 
   return (
     <div className={clx("absolute inset-0 overflow-hidden", className)}>
-      <Image
-        src={mobile}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={pair.mobile}
         alt={alt}
-        fill
-        sizes={sizes}
-        priority={priority}
-        loading={priority ? "eager" : "lazy"}
         className={clx(shared, "small:hidden")}
-      />
-      <Image
-        src={desktopSrc}
-        alt={alt}
-        fill
-        sizes={sizes}
-        priority={priority}
         loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        decoding="async"
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={pair.desktop}
+        alt={alt}
         className={clx(shared, "hidden small:block")}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        decoding="async"
       />
     </div>
   )

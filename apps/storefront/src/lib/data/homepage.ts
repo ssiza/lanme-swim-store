@@ -1,6 +1,5 @@
 "use server"
 
-import { sdk } from "@lib/config"
 import {
   logFetchEnd,
   logFetchError,
@@ -81,97 +80,138 @@ const EMPTY_SETTINGS: HomepageSettings = {
   footer_configured: false,
 }
 
+const normalizeSettings = (settings: HomepageSettings): HomepageSettings => {
+  const hero_slides = Array.isArray(settings.hero_slides)
+    ? settings.hero_slides
+    : []
+
+  if (
+    hero_slides.length === 0 &&
+    typeof settings.hero_background_image_url === "string" &&
+    settings.hero_background_image_url.trim()
+  ) {
+    hero_slides.push({
+      id: "legacy_hero",
+      desktop_image_url: settings.hero_background_image_url,
+      mobile_image_url: null,
+      headline: null,
+      subheadline: null,
+      cta_label: null,
+      cta_href: null,
+      sort_order: 0,
+    })
+  }
+
+  return {
+    ...EMPTY_SETTINGS,
+    ...settings,
+    hero_slides,
+    featured_categories: Array.isArray(settings.featured_categories)
+      ? settings.featured_categories
+      : [],
+    featured_collections: Array.isArray(settings.featured_collections)
+      ? settings.featured_collections
+      : [],
+    footer_links: Array.isArray(settings.footer_links)
+      ? settings.footer_links
+      : [],
+    footer_support_links: Array.isArray(settings.footer_support_links)
+      ? settings.footer_support_links
+      : [],
+    footer_about_links: Array.isArray(settings.footer_about_links)
+      ? settings.footer_about_links
+      : [],
+    footer_configured: Boolean(settings.footer_configured),
+    footer_about:
+      typeof settings.footer_about === "string" ? settings.footer_about : null,
+    footer_address:
+      typeof settings.footer_address === "string"
+        ? settings.footer_address
+        : null,
+  }
+}
+
+/**
+ * Fetch homepage CMS from the public backend route (no publishable key).
+ * Falls back to /store/homepage if the public route is unavailable.
+ */
 export const getHomepageSettings = async (): Promise<HomepageSettings> => {
   logFetchStart("getHomepageSettings")
 
   const next = await getDiscoveryCacheNext("homepage")
-  const fetchUrl = "/store/homepage"
+  const backendUrl = (
+    process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+  ).replace(/\/$/, "")
 
-  logCacheFetch("start", {
-    route: "/homepage",
-    fetchUrl,
-    cacheMode: "force-cache",
-    revalidate: next.revalidate,
-    tags: next.tags,
-  })
+  const candidates = [
+    `${backendUrl}/storefront/homepage`,
+    `${backendUrl}/store/homepage`,
+  ]
 
-  try {
-    const settings = await sdk.client.fetch<HomepageSettings>(fetchUrl, {
-      next,
-      cache: "force-cache",
-    })
-
-    const hero_slides = Array.isArray(settings.hero_slides)
-      ? settings.hero_slides
-      : []
-
-    if (
-      hero_slides.length === 0 &&
-      typeof settings.hero_background_image_url === "string" &&
-      settings.hero_background_image_url.trim()
-    ) {
-      hero_slides.push({
-        id: "legacy_hero",
-        desktop_image_url: settings.hero_background_image_url,
-        mobile_image_url: null,
-        headline: null,
-        subheadline: null,
-        cta_label: null,
-        cta_href: null,
-        sort_order: 0,
-      })
-    }
-
-    logCacheFetch("end", {
+  for (const fetchUrl of candidates) {
+    logCacheFetch("start", {
       route: "/homepage",
       fetchUrl,
       cacheMode: "force-cache",
       revalidate: next.revalidate,
       tags: next.tags,
-      returnedCount: 1,
     })
 
-    logFetchEnd("getHomepageSettings", {
-      hasHeroImage: Boolean(
-        hero_slides[0]?.desktop_image_url || settings.hero_background_image_url
-      ),
-      slideCount: hero_slides.length,
-      categoryBannerCount: settings.featured_categories?.length ?? 0,
-      collectionBlockCount: settings.featured_collections?.length ?? 0,
-      hasFooterAbout: Boolean(settings.footer_about),
-      footerConfigured: Boolean(settings.footer_configured),
-    })
+    try {
+      const response = await fetch(fetchUrl, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          // Harmless on the public route; required if we fall back to /store/*.
+          ...(process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+            ? {
+                "x-publishable-api-key":
+                  process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+              }
+            : {}),
+        },
+        next,
+        cache: "force-cache",
+      })
 
-    return {
-      ...EMPTY_SETTINGS,
-      ...settings,
-      hero_slides,
-      featured_categories: Array.isArray(settings.featured_categories)
-        ? settings.featured_categories
-        : [],
-      featured_collections: Array.isArray(settings.featured_collections)
-        ? settings.featured_collections
-        : [],
-      footer_links: Array.isArray(settings.footer_links)
-        ? settings.footer_links
-        : [],
-      footer_support_links: Array.isArray(settings.footer_support_links)
-        ? settings.footer_support_links
-        : [],
-      footer_about_links: Array.isArray(settings.footer_about_links)
-        ? settings.footer_about_links
-        : [],
-      footer_configured: Boolean(settings.footer_configured),
-      // Preserve empty-string about/address from CMS (do not coalesce away).
-      footer_about:
-        typeof settings.footer_about === "string" ? settings.footer_about : null,
-      footer_address:
-        typeof settings.footer_address === "string"
-          ? settings.footer_address
-          : null,
+      if (!response.ok) {
+        logFetchError("getHomepageSettings", new Error(`HTTP ${response.status}`), {
+          fetchUrl,
+        })
+        continue
+      }
+
+      const settings = (await response.json()) as HomepageSettings
+      const normalized = normalizeSettings(settings)
+
+      logCacheFetch("end", {
+        route: "/homepage",
+        fetchUrl,
+        cacheMode: "force-cache",
+        revalidate: next.revalidate,
+        tags: next.tags,
+        returnedCount: 1,
+      })
+
+      logFetchEnd("getHomepageSettings", {
+        fetchUrl,
+        hasHeroImage: Boolean(
+          normalized.hero_slides[0]?.desktop_image_url ||
+            normalized.hero_slides[0]?.mobile_image_url ||
+            normalized.hero_background_image_url
+        ),
+        slideCount: normalized.hero_slides.length,
+        categoryBannerCount: normalized.featured_categories.length,
+        collectionBlockCount: normalized.featured_collections.length,
+        hasFooterAbout: Boolean(normalized.footer_about),
+        footerConfigured: Boolean(normalized.footer_configured),
+      })
+
+      return normalized
+    } catch (error) {
+      logFetchError("getHomepageSettings", error, { fetchUrl })
     }
-  } catch (error) {
-    logFetchError("getHomepageSettings", error)
-    return EMPTY_SETTINGS
   }
+
+  return EMPTY_SETTINGS
 }

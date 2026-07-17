@@ -12,7 +12,7 @@ import ImageBanner from "@modules/home/components/image-banner"
 type HomepageProps = {
   settings: HomepageSettings
   collections: HttpTypes.StoreCollection[]
-  region: HttpTypes.StoreRegion
+  region: HttpTypes.StoreRegion | null
   countryCode: string
 }
 
@@ -69,13 +69,15 @@ const Homepage = ({
           ctaLabel="Explore"
           size={index === 0 ? "tall" : "medium"}
           align={index % 2 === 0 ? "left" : "right"}
+          priority={index === 0}
         />
       ))}
 
       {orderedBlocks.map((block, index) => {
         const collection = byId.get(block.id)
-        const showBanner =
-          block.featured_on_homepage && Boolean(block.cover_image_url)
+        const showBanner = Boolean(
+          block.cover_image_url || block.mobile_image_url
+        )
 
         return (
           <div key={block.id} className="flex flex-col">
@@ -83,7 +85,7 @@ const Homepage = ({
               <ImageBanner
                 title={block.promo_headline || block.title}
                 description={block.description}
-                desktopImage={block.cover_image_url!}
+                desktopImage={block.cover_image_url}
                 mobileImage={block.mobile_image_url}
                 href={block.cta_href || `/collections/${block.handle}`}
                 ctaLabel={block.cta_label || "Shop the edit"}
@@ -92,7 +94,7 @@ const Homepage = ({
               />
             ) : null}
 
-            {block.show_products_on_homepage && collection ? (
+            {region && block.show_products_on_homepage && collection ? (
               <ProductRail
                 collection={collection}
                 region={region}
