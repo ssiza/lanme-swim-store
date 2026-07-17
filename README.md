@@ -434,9 +434,11 @@ Production image is built with `apps/backend/Dockerfile`: `medusa build` output 
 | Builder | `apps/storefront/Dockerfile` (storefront-only `npm ci`) |
 | Health check | `GET /api/health` |
 
-`NEXT_PUBLIC_*` variables must be set on the service **before** deploy — they are baked in at `next build`. The container runs `node server.js` (Next.js standalone) on Railway `PORT`.
+`NEXT_PUBLIC_*` variables must be set on the service **before** deploy — they are baked in at `next build`. The container binds Next.js standalone to `0.0.0.0` on Railway `PORT` (`HOSTNAME=0.0.0.0 exec node /app/apps/storefront/server.js`).
 
 **Docker builds:** Railway does not inject service variables into `RUN` steps automatically. Each `NEXT_PUBLIC_*` variable must be enabled **Available at Build Time** (variable ⋮ menu in Railway). The Dockerfile declares matching `ARG` names so Railway passes them as build-args.
+
+**Health checks:** Railway uses `GET /api/health` (instant liveness). Use `GET /api/ready` to verify the Medusa backend + publishable key after deploy.
 
 ### Backend environment variables
 
@@ -537,6 +539,12 @@ npm run railway:migrate:backend
 - `JWT_SECRET` and `COOKIE_SECRET` should be hex-only (`openssl rand -hex 32`).
 - Storefront uses **`apps/storefront/Dockerfile`** instead of Railpack — installs only the storefront workspace (not the full Medusa backend) and produces a smaller standalone Next.js image.
 - If a service builds the wrong app, check Root Directory is empty and Config as Code points at the matching `apps/*/railway.toml`.
+
+**Storefront healthcheck fails / crash loop after a successful build**
+
+- Confirm Config as Code is `/apps/storefront/railway.toml` (not the root `railway.toml`, which builds the backend).
+- The start command must force `HOSTNAME=0.0.0.0` — Railway often overwrites `HOSTNAME` with the container id, and Next.js then binds to an unreachable name.
+- Confirm every `NEXT_PUBLIC_*` variable has **Available at Build Time** enabled, then **Redeploy** (not just restart) so the image is rebuilt.
 
 ### Local production scripts
 

@@ -18,7 +18,9 @@ watchPatterns = [
 ]
 
 [deploy]
-startCommand = "node server.js"
+# Absolute path + HOSTNAME override: Railway may overwrite ENV HOSTNAME with the
+# container hostname, which breaks Next.js standalone binding / healthchecks.
+startCommand = "sh -c 'HOSTNAME=0.0.0.0 exec node /app/apps/storefront/server.js'"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"

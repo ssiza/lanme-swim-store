@@ -18,7 +18,7 @@
     "railway:migrate:backend": "cd apps/backend/.medusa/server && NODE_ENV=production npx medusa db:migrate",
     "railway:start:backend": "cd apps/backend/.medusa/server && NODE_ENV=production npx medusa start",
     "railway:build:storefront": "npm run build --workspace=@dtc/storefront",
-    "railway:start:storefront": "npm run start --workspace=@dtc/storefront",
+    "railway:start:storefront": "sh -c 'HOSTNAME=0.0.0.0 node apps/storefront/.next/standalone/apps/storefront/server.js'",
     "debug-storefront-products": "npx tsx scripts/debug-storefront-products.ts"
   },
   "pnpm": {
