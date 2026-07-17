@@ -42,6 +42,8 @@ export function revalidateDiscoveryCache(payload: RevalidatePayload = {}) {
       `/${countryCode}/collections`
     )
 
+    // Layout includes the footer (CMS about/links) — bust it on homepage/store updates.
+    revalidatePath(`/${countryCode}`, "layout")
     revalidatePath(`/${countryCode}/categories`, "layout")
 
     if (payload.productHandle) {
