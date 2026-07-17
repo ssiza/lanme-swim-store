@@ -40,7 +40,17 @@ export async function GET() {
           )
         )
       } else {
-        backendError = `HTTP ${response.status}`
+        const body = (await response.json().catch(() => null)) as {
+          message?: string
+          type?: string
+        } | null
+        backendError =
+          body?.message ||
+          `HTTP ${response.status}${
+            response.status === 400
+              ? " (publishable API key missing/invalid — set NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY from Medusa Admin → Settings → Publishable API Keys, enable Available at Build Time, redeploy)"
+              : ""
+          }`
       }
     } catch (error) {
       backendError =

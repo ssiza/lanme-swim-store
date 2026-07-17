@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 import { getDefaultCountryCode } from "@lib/constants/region"
 import {
+  hasAcceptableCountryPrefix,
   isCountryPathSegment,
   logRegionResolution,
   resolveFallbackCountry,
@@ -173,12 +174,15 @@ export async function middleware(request: NextRequest) {
   })
 
   const firstPathSegment = urlCountryCode
-  const urlHasValidCountry =
-    Boolean(firstPathSegment) &&
-    firstPathSegment === country.toLowerCase() &&
-    regionMap.has(firstPathSegment)
+  // regionMap.has(...) alone loops forever when Medusa regions cannot be loaded
+  // (empty map): /us → resolve "us" → not in map → redirect /us → …
+  const urlHasAcceptableCountry = hasAcceptableCountryPrefix(
+    firstPathSegment,
+    country,
+    regionMap
+  )
 
-  if (urlHasValidCountry) {
+  if (urlHasAcceptableCountry) {
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set("x-pathname", request.nextUrl.pathname)
 
@@ -200,6 +204,11 @@ export async function middleware(request: NextRequest) {
   const redirectPath = stripLeadingCountrySegment(request.nextUrl.pathname)
   const queryString = request.nextUrl.search || ""
   const redirectUrl = `${request.nextUrl.origin}/${country}${redirectPath}${queryString}`
+
+  // Absolute last resort against same-URL redirect loops.
+  if (redirectUrl === request.nextUrl.href) {
+    return NextResponse.next()
+  }
 
   return NextResponse.redirect(redirectUrl, 307)
 }
