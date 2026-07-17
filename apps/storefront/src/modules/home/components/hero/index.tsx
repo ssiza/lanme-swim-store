@@ -1,81 +1,105 @@
-import {
-  SITE_COPY,
-  SITE_DESCRIPTION,
-  SITE_NAME,
-  SITE_TAGLINE,
-} from "@lib/constants/site"
+import { SITE_NAME } from "@lib/constants/site"
+import type { HomepageHeroSlide } from "@lib/data/homepage"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { Button, Heading, Text, clx } from "@modules/common/components/ui"
+import EditorialImage from "@modules/common/components/editorial-image"
+import { clx } from "@modules/common/components/ui"
 
 type HeroProps = {
-  collectionsHref?: string
+  slides?: HomepageHeroSlide[]
+  /** @deprecated use slides */
   backgroundImageUrl?: string | null
+  collectionsHref?: string
 }
 
 const Hero = ({
-  collectionsHref = "/store",
+  slides = [],
   backgroundImageUrl = null,
+  collectionsHref = "/store",
 }: HeroProps) => {
-  const hasBackgroundImage = Boolean(backgroundImageUrl)
+  const slide =
+    slides[0] ??
+    (backgroundImageUrl
+      ? {
+          id: "legacy",
+          desktop_image_url: backgroundImageUrl,
+          mobile_image_url: null,
+          headline: null,
+          subheadline: null,
+          cta_label: null,
+          cta_href: null,
+          sort_order: 0,
+        }
+      : null)
+
+  const imageUrl = slide?.desktop_image_url
+  const hasImage = Boolean(imageUrl)
+  const headline = slide?.headline?.trim() || SITE_NAME
+  const subheadline = slide?.subheadline?.trim() || null
+  const ctaLabel = slide?.cta_label?.trim() || "Shop resort"
+  const ctaHref = slide?.cta_href?.trim() || collectionsHref
 
   return (
-    <section className="relative w-full overflow-hidden shadow-[0_18px_45px_rgba(12,42,81,0.05)]">
+    <section className="relative w-full overflow-hidden">
       <div
         className={clx(
-          "relative",
-          hasBackgroundImage
-            ? "min-h-[24rem] small:min-h-[28rem]"
-            : "bg-gradient-to-b from-[#fff3cf] via-brand-mist/80 to-white",
+          "group relative flex min-h-[78vh] w-full items-end small:min-h-[88vh] small:items-center",
+          !hasImage && "bg-brand-mist"
         )}
       >
-        {hasBackgroundImage && (
+        {hasImage && imageUrl ? (
           <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={backgroundImageUrl!}
+            <EditorialImage
+              desktopSrc={imageUrl}
+              mobileSrc={slide?.mobile_image_url}
               alt=""
-              className="absolute inset-0 h-full w-full object-cover object-center"
-              fetchPriority="high"
+              priority
             />
             <div
-              className="absolute inset-0 bg-gradient-to-b from-white/75 via-white/70 to-white/85"
+              className="absolute inset-0 bg-gradient-to-t from-brand-ink/55 via-brand-ink/15 to-brand-ink/10 small:bg-gradient-to-r small:from-brand-ink/50 small:via-brand-ink/20 small:to-transparent"
               aria-hidden
             />
           </>
-        )}
+        ) : null}
 
-        <div className="content-container relative flex flex-col items-center justify-center px-6 py-20 text-center small:py-24">
-          <div className="flex max-w-2xl flex-col items-center gap-7">
-            <div className="flex flex-col gap-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-brand-sea">
-                {SITE_NAME}
+        <div className="content-container relative z-10 w-full px-6 py-16 small:py-24">
+          <div
+            className={clx(
+              "flex max-w-xl flex-col items-start gap-6 text-left",
+              hasImage ? "text-white" : "text-brand-ink"
+            )}
+          >
+            <p
+              className={clx(
+                "text-[11px] font-medium uppercase tracking-[0.22em]",
+                hasImage ? "text-white/80" : "text-brand-ink/60"
+              )}
+            >
+              {SITE_NAME}
+            </p>
+            <h1 className="font-display text-4xl font-normal leading-[1.05] tracking-tight small:text-6xl">
+              {headline}
+            </h1>
+            {subheadline ? (
+              <p
+                className={clx(
+                  "max-w-md text-base font-normal leading-relaxed small:text-lg",
+                  hasImage ? "text-white/85" : "text-brand-ink/70"
+                )}
+              >
+                {subheadline}
               </p>
-              <Heading
-                level="h1"
-                className="font-display text-4xl font-normal leading-[1.1] tracking-tight text-brand-ink small:text-5xl"
-              >
-                {SITE_TAGLINE}
-              </Heading>
-              <Text
-                as="p"
-                className="mx-auto max-w-xl text-base-regular text-ui-fg-subtle small:text-lg"
-              >
-                {SITE_DESCRIPTION}
-              </Text>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <LocalizedClientLink href="/store">
-                <Button className="bg-brand-sea text-white hover:bg-brand-sea/90 border-brand-sea">
-                  {SITE_COPY.shopTheEdit}
-                </Button>
-              </LocalizedClientLink>
-              <LocalizedClientLink href={collectionsHref}>
-                <Button variant="secondary">
-                  {SITE_COPY.exploreCollections}
-                </Button>
-              </LocalizedClientLink>
-            </div>
+            ) : null}
+            <LocalizedClientLink
+              href={ctaHref}
+              className={clx(
+                "inline-flex items-center justify-center px-7 py-3 text-sm font-medium tracking-wide transition-colors duration-300",
+                hasImage
+                  ? "border border-white/80 bg-white/10 text-white backdrop-blur-[2px] hover:bg-white hover:text-brand-ink"
+                  : "border border-brand-ink bg-brand-ink text-white hover:bg-transparent hover:text-brand-ink"
+              )}
+            >
+              {ctaLabel}
+            </LocalizedClientLink>
           </div>
         </div>
       </div>

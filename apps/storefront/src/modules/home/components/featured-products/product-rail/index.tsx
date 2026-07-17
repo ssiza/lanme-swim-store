@@ -5,15 +5,20 @@ import { Text } from "@modules/common/components/ui"
 
 import InteractiveLink from "@modules/common/components/interactive-link"
 import ProductPreview from "@modules/products/components/product-preview"
+import Reveal from "@modules/common/components/reveal"
 
 export default async function ProductRail({
   collection,
   region,
   countryCode,
+  headline,
+  ctaLabel,
 }: {
   collection: HttpTypes.StoreCollection
   region: HttpTypes.StoreRegion
   countryCode: string
+  headline?: string | null
+  ctaLabel?: string | null
 }) {
   const { response } = await listProducts({
     countryCode,
@@ -21,7 +26,7 @@ export default async function ProductRail({
     collectionHandle: collection.handle,
     queryParams: {
       collection_id: [collection.id],
-      limit: 12,
+      limit: 8,
       fields: "*variants.calculated_price",
     },
   })
@@ -33,22 +38,28 @@ export default async function ProductRail({
   }
 
   return (
-    <div className="content-container py-12 small:py-24">
-      <div className="flex justify-between mb-8 items-baseline gap-4">
-        <Text className="font-display text-2xl font-normal tracking-tight text-brand-ink small:text-3xl">
-          {collection.title}
-        </Text>
-        <InteractiveLink href={`/collections/${collection.handle}`}>
-          {SITE_COPY.shopSwim}
-        </InteractiveLink>
+    <Reveal>
+      <div className="content-container py-14 small:py-20">
+        <div className="mb-10 flex items-end justify-between gap-4">
+          <Text className="font-display text-2xl font-normal tracking-tight text-brand-ink small:text-4xl">
+            {headline || collection.title}
+          </Text>
+          <InteractiveLink href={`/collections/${collection.handle}`}>
+            {ctaLabel || SITE_COPY.shopSwim}
+          </InteractiveLink>
+        </div>
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-12 small:grid-cols-4 small:gap-x-6 small:gap-y-16">
+          {pricedProducts.map((product, index) => (
+            <li
+              key={product.id}
+              className="transition-transform duration-500 ease-out hover:-translate-y-1"
+              style={{ transitionDelay: `${Math.min(index, 3) * 40}ms` }}
+            >
+              <ProductPreview product={product} region={region} isFeatured />
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="grid grid-cols-2 small:grid-cols-3 gap-x-6 gap-y-24 small:gap-y-36">
-        {pricedProducts.map((product) => (
-          <li key={product.id}>
-            <ProductPreview product={product} region={region} isFeatured />
-          </li>
-        ))}
-      </ul>
-    </div>
+    </Reveal>
   )
 }
