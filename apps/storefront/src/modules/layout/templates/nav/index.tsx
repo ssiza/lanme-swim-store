@@ -7,6 +7,7 @@ import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import SiteLogo from "@modules/common/components/site-logo"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import ShoppingBag from "@modules/common/icons/shopping-bag"
 import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
 
@@ -71,11 +72,12 @@ export default async function Nav() {
             <Suspense
               fallback={
                 <LocalizedClientLink
-                  className="hover:text-ui-fg-base flex gap-2"
+                  className="hover:text-ui-fg-base flex items-center gap-1.5"
                   href="/cart"
                   data-testid="nav-cart-link"
                 >
-                  {SITE_COPY.bag} (0)
+                  <ShoppingBag size={18} />
+                  <span>{SITE_COPY.bag} (0)</span>
                 </LocalizedClientLink>
               }
             >

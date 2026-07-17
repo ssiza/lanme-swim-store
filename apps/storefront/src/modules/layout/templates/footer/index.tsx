@@ -15,6 +15,8 @@ import SiteLogo from "@modules/common/components/site-logo"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import type { ReactNode } from "react"
 
+const footerLinkClassName = "font-semibold hover:text-ui-fg-base"
+
 function FooterLinkItem({
   href,
   children,
@@ -28,7 +30,7 @@ function FooterLinkItem({
     return (
       <a
         href={href}
-        className="hover:text-ui-fg-base"
+        className={footerLinkClassName}
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -38,7 +40,7 @@ function FooterLinkItem({
   }
 
   return (
-    <LocalizedClientLink className="hover:text-ui-fg-base" href={href}>
+    <LocalizedClientLink className={footerLinkClassName} href={href}>
       {children}
     </LocalizedClientLink>
   )
@@ -142,7 +144,7 @@ export default async function Footer() {
                       >
                         <LocalizedClientLink
                           className={clx(
-                            "hover:text-ui-fg-base",
+                            footerLinkClassName,
                             children && "txt-small-plus"
                           )}
                           href={`/categories/${getCategoryPath(c)}`}
@@ -155,7 +157,7 @@ export default async function Footer() {
                             {children.map((child) => (
                               <li key={child.id}>
                                 <LocalizedClientLink
-                                  className="hover:text-ui-fg-base"
+                                  className={footerLinkClassName}
                                   href={`/categories/${c.handle}/${child.handle}`}
                                   data-testid="category-link"
                                 >
@@ -187,7 +189,7 @@ export default async function Footer() {
                   {collectionsWithProducts.slice(0, 6).map((c) => (
                     <li key={c.id}>
                       <LocalizedClientLink
-                        className="hover:text-ui-fg-base"
+                        className={footerLinkClassName}
                         href={`/collections/${c.handle}`}
                       >
                         {c.title}
@@ -204,7 +206,7 @@ export default async function Footer() {
               <ul className="grid grid-cols-1 gap-y-2 text-brand-ink/70 txt-small">
                 <li>
                   <LocalizedClientLink
-                    className="hover:text-ui-fg-base"
+                    className={footerLinkClassName}
                     href="/store"
                   >
                     {SITE_COPY.shopAll}
@@ -212,7 +214,7 @@ export default async function Footer() {
                 </li>
                 <li>
                   <LocalizedClientLink
-                    className="hover:text-ui-fg-base"
+                    className={footerLinkClassName}
                     href="/account"
                   >
                     {SITE_COPY.account}
@@ -220,7 +222,7 @@ export default async function Footer() {
                 </li>
                 <li>
                   <LocalizedClientLink
-                    className="hover:text-ui-fg-base"
+                    className={footerLinkClassName}
                     href="/cart"
                   >
                     {SITE_COPY.bag}
