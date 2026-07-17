@@ -1,7 +1,4 @@
-"use client"
-
 import { clx } from "@modules/common/components/ui"
-import Image from "next/image"
 
 type EditorialImageProps = {
   desktopSrc: string
@@ -10,12 +7,12 @@ type EditorialImageProps = {
   priority?: boolean
   className?: string
   imageClassName?: string
-  sizes?: string
 }
 
 /**
- * Full-bleed responsive photography with subtle hover zoom.
- * Desktop/mobile art-direction via CSS visibility (avoids layout shift).
+ * Full-bleed CMS photography.
+ * Uses native <img> (not next/image) so S3 / Medusa upload hosts are never
+ * blocked by remotePatterns, while still supporting lazy-load + art direction.
  */
 const EditorialImage = ({
   desktopSrc,
@@ -24,33 +21,32 @@ const EditorialImage = ({
   priority = false,
   className,
   imageClassName,
-  sizes = "100vw",
 }: EditorialImageProps) => {
   const mobile = mobileSrc || desktopSrc
   const shared = clx(
-    "object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-[1.03]",
+    "absolute inset-0 h-full w-full object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-[1.03]",
     imageClassName
   )
 
   return (
     <div className={clx("absolute inset-0 overflow-hidden", className)}>
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={mobile}
         alt={alt}
-        fill
-        sizes={sizes}
-        priority={priority}
-        loading={priority ? "eager" : "lazy"}
         className={clx(shared, "small:hidden")}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        decoding="async"
       />
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={desktopSrc}
         alt={alt}
-        fill
-        sizes={sizes}
-        priority={priority}
-        loading={priority ? "eager" : "lazy"}
         className={clx(shared, "hidden small:block")}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        decoding="async"
       />
     </div>
   )

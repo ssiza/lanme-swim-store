@@ -12,7 +12,7 @@ import ImageBanner from "@modules/home/components/image-banner"
 type HomepageProps = {
   settings: HomepageSettings
   collections: HttpTypes.StoreCollection[]
-  region: HttpTypes.StoreRegion
+  region: HttpTypes.StoreRegion | null
   countryCode: string
 }
 
@@ -69,6 +69,7 @@ const Homepage = ({
           ctaLabel="Explore"
           size={index === 0 ? "tall" : "medium"}
           align={index % 2 === 0 ? "left" : "right"}
+          priority={index === 0}
         />
       ))}
 
@@ -92,7 +93,7 @@ const Homepage = ({
               />
             ) : null}
 
-            {block.show_products_on_homepage && collection ? (
+            {region && block.show_products_on_homepage && collection ? (
               <ProductRail
                 collection={collection}
                 region={region}

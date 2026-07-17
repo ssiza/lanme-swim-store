@@ -1,10 +1,7 @@
 import { Metadata } from "next"
 
 import Homepage from "@modules/home/components/homepage"
-import Hero from "@modules/home/components/hero"
-import EmptyProducts from "@modules/store/components/empty-products"
 import { SITE_DESCRIPTION, SITE_NAME } from "@lib/constants/site"
-import { getDefaultCountryCode } from "@lib/constants/region"
 import { getHomepageSettings } from "@lib/data/homepage"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
@@ -30,43 +27,31 @@ export default async function Home(props: {
 
   logPageRender(route, { step: "home_start" })
 
-  const region = await getRegion(countryCode)
+  // Homepage CMS is public (no publishable key). Region/products still need a
+  // valid key — banners/hero must render even when catalog APIs fail.
+  const [region, homepageSettings, collectionsResult] = await Promise.all([
+    getRegion(countryCode),
+    getHomepageSettings(),
+    listCollections({ fields: "id, handle, title" }, route),
+  ])
 
-  const [{ collections: allCollections }, homepageSettings] =
-    await Promise.all([
-      listCollections({ fields: "id, handle, title" }, route),
-      getHomepageSettings(),
-    ])
-
+  const allCollections = collectionsResult.collections ?? []
   const collections = region
-    ? await filterCollectionsWithProducts(allCollections ?? [], countryCode)
+    ? await filterCollectionsWithProducts(allCollections, countryCode)
     : []
 
   logPageRender(route, {
     step: "home_data_ready",
     hasRegion: Boolean(region),
     collectionCount: collections.length,
-    totalCollections: allCollections?.length ?? 0,
+    totalCollections: allCollections.length,
     heroSlides: homepageSettings.hero_slides.length,
     categoryBanners: homepageSettings.featured_categories.length,
+    hasHeroImage: Boolean(
+      homepageSettings.hero_slides[0]?.desktop_image_url ||
+        homepageSettings.hero_background_image_url
+    ),
   })
-
-  if (!region) {
-    return (
-      <>
-        <Hero
-          slides={homepageSettings.hero_slides}
-          backgroundImageUrl={homepageSettings.hero_background_image_url}
-        />
-        <div className="content-container py-12">
-          <EmptyProducts
-            title="Welcome to Lanmè Swim"
-            description={`We could not load products for this region. Visit /${getDefaultCountryCode()}/store to continue.`}
-          />
-        </div>
-      </>
-    )
-  }
 
   return (
     <Homepage
