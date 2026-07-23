@@ -1,6 +1,6 @@
 # Custom scheduled jobs
 
-A scheduled job is a function executed at a specified interval of time in the background of your Medusa application.
+A scheduled job is a function executed at a specified interval of time in the background of your Lanme Swim application.
 
 > Learn more about scheduled jobs in [this documentation](https://docs.medusajs.com/learn/fundamentals/scheduled-jobs).
 
@@ -10,10 +10,10 @@ For example, create the file `src/jobs/hello-world.ts` with the following conten
 
 ```ts
 import {
-  MedusaContainer
+  Lanme SwimContainer
 } from "@medusajs/framework/types";
 
-export default async function myCustomJob(container: MedusaContainer) {
+export default async function myCustomJob(container: Lanme SwimContainer) {
   const productService = container.resolve("product")
 
   const products = await productService.listAndCountProducts();
@@ -35,4 +35,4 @@ A scheduled job file must export:
   - `schedule`: a [cron expression](https://crontab.guru/).
   - `numberOfExecutions`: an optional integer, specifying how many times the job will execute before being removed
 
-The `handler` is a function that accepts one parameter, `container`, which is a `MedusaContainer` instance used to resolve services.
+The `handler` is a function that accepts one parameter, `container`, which is a `Lanme SwimContainer` instance used to resolve services.

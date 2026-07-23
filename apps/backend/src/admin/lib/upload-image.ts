@@ -13,7 +13,7 @@ async function readUploadError(response: Response): Promise<string> {
   return `Upload failed (${response.status})`
 }
 
-/** Compress + upload a single image via Medusa admin uploads. */
+/** Compress + upload a single image via Lanme Swim admin uploads. */
 export async function uploadAdminImage(file: File): Promise<string> {
   const fileToUpload = await compressImageForUpload(file)
   const formData = new FormData()

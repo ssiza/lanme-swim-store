@@ -8,7 +8,7 @@ NIXPACKS_NODE_VERSION = "20"
 nixPkgs = ["nodejs_20"]
 
 # Railway sets NODE_ENV=production on services, which makes `npm ci` skip
-# devDependencies. Medusa's build needs ts-node/typescript to load medusa-config.ts.
+# devDependencies. Lanme Swim's build needs ts-node/typescript to load medusa-config.ts.
 [phases.install]
 cmds = ["npm ci --include=dev"]
 

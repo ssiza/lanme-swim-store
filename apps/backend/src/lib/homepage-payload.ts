@@ -1,5 +1,5 @@
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
-import type { MedusaContainer } from "@medusajs/framework"
+import type { Lanme SwimContainer } from "@medusajs/framework"
 import { getCategoryHomepageSettings } from "./category-homepage-settings"
 import { getCollectionHomepageSettings } from "./collection-homepage-settings"
 import { getFooterSettings } from "./footer-settings"
@@ -20,7 +20,7 @@ async function safeGraphQuery<T>(
 }
 
 /**
- * Turn relative Medusa/local upload paths into absolute URLs the storefront
+ * Turn relative Lanme Swim/local upload paths into absolute URLs the storefront
  * can load. Absolute http(s) URLs (S3) are left unchanged.
  */
 export const resolvePublicMediaUrl = (
@@ -57,7 +57,7 @@ const resolveSlide = (slide: HeroSlide, backendUrl: string | null): HeroSlide =>
   mobile_image_url: resolvePublicMediaUrl(slide.mobile_image_url, backendUrl),
 })
 
-export async function buildHomepagePayload(container: MedusaContainer) {
+export async function buildHomepagePayload(container: Lanme SwimContainer) {
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
   const backendUrl =
     process.env.MEDUSA_BACKEND_URL?.replace(/\/$/, "") ||

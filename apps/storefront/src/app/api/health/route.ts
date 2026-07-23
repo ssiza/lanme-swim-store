@@ -1,6 +1,6 @@
 /**
  * Liveness probe for Railway / load balancers.
- * Keep this instant — do not call Medusa here or a backend outage will fail deploys.
+ * Keep this instant — do not call Lanme Swim here or a backend outage will fail deploys.
  * Use /api/ready for backend connectivity checks.
  */
 export async function GET() {

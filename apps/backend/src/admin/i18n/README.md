@@ -1,6 +1,6 @@
 # Admin Customizations Translations
 
-The Medusa Admin dashboard supports multiple languages for its interface. Medusa uses [react-i18next](https://react.i18next.com/) to manage translations in the admin dashboard.
+The Lanme Swim Admin dashboard supports multiple languages for its interface. Lanme Swim uses [react-i18next](https://react.i18next.com/) to manage translations in the admin dashboard.
 
 To add translations, create JSON translation files for each language under the `src/admin/i18n/json` directory. For example, create the `src/admin/i18n/json/en.json` file with the following content:
 

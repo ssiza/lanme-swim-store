@@ -1,6 +1,6 @@
 #!/usr/bin/env npx tsx
 /**
- * Diagnose Medusa storefront product visibility.
+ * Diagnose Lanme Swim storefront product visibility.
  *
  * Usage:
  *   NEXT_PUBLIC_MEDUSA_BACKEND_URL=... \

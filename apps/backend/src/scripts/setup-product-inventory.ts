@@ -1,4 +1,4 @@
-import type { MedusaContainer } from "@medusajs/framework"
+import type { Lanme SwimContainer } from "@medusajs/framework"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 import {
   createProductOptionsWorkflow,
@@ -33,7 +33,7 @@ import {
 } from "../lib/product-variant-presets"
 
 type ScriptInput = {
-  container: MedusaContainer
+  container: Lanme SwimContainer
   args: string[]
 }
 
@@ -63,7 +63,7 @@ const PRODUCT_FIELDS = [
 ]
 
 const loadProductByHandle = async (
-  container: MedusaContainer,
+  container: Lanme SwimContainer,
   handle: string
 ) => {
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
@@ -80,7 +80,7 @@ const loadProductByHandle = async (
 }
 
 const reloadProductByHandle = async (
-  container: MedusaContainer,
+  container: Lanme SwimContainer,
   handle: string
 ) => {
   const product = await loadProductByHandle(container, handle)
@@ -93,7 +93,7 @@ const reloadProductByHandle = async (
 }
 
 const ensurePresetOptions = async (
-  container: MedusaContainer,
+  container: Lanme SwimContainer,
   product: ProductWithVariantsRecord,
   plan: SetupProductInventoryPlan
 ) => {
@@ -143,7 +143,7 @@ const ensurePresetOptions = async (
 }
 
 const applySetupProductInventoryPlan = async (
-  container: MedusaContainer,
+  container: Lanme SwimContainer,
   product: ProductWithVariantsRecord,
   plan: SetupProductInventoryPlan
 ) => {
@@ -207,7 +207,7 @@ const linkProductToReusableInventory = async ({
   dryRun,
   summary,
 }: {
-  container: MedusaContainer
+  container: Lanme SwimContainer
   product: ProductWithVariantsRecord
   plan: SetupProductInventoryPlan
   locationId: string

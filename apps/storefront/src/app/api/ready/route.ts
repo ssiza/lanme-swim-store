@@ -1,7 +1,7 @@
 const BACKEND_TIMEOUT_MS = 5000
 
 /**
- * Readiness probe — verifies Medusa backend + publishable key wiring.
+ * Readiness probe — verifies Lanme Swim backend + publishable key wiring.
  * Not used by Railway healthchecks (those hit /api/health).
  */
 export async function GET() {
@@ -48,7 +48,7 @@ export async function GET() {
           body?.message ||
           `HTTP ${response.status}${
             response.status === 400
-              ? " (publishable API key missing/invalid — set NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY from Medusa Admin → Settings → Publishable API Keys, enable Available at Build Time, redeploy)"
+              ? " (publishable API key missing/invalid — set NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY from Lanme Swim Admin → Settings → Publishable API Keys, enable Available at Build Time, redeploy)"
               : ""
           }`
       }

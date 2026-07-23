@@ -2,16 +2,16 @@
 
 An API Route is a REST API endpoint.
 
-An API Route is created in a TypeScript or JavaScript file under the `/src/api` directory of your Medusa application. The file’s name must be `route.ts` or `route.js`.
+An API Route is created in a TypeScript or JavaScript file under the `/src/api` directory of your Lanme Swim application. The file’s name must be `route.ts` or `route.js`.
 
 > Learn more about API Routes in [this documentation](https://docs.medusajs.com/learn/fundamentals/api-routes)
 
 For example, to create a `GET` API Route at `/store/hello-world`, create the file `src/api/store/hello-world/route.ts` with the following content:
 
 ```ts
-import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
+import type { Lanme SwimRequest, Lanme SwimResponse } from "@medusajs/framework/http";
 
-export async function GET(req: MedusaRequest, res: MedusaResponse) {
+export async function GET(req: Lanme SwimRequest, res: Lanme SwimResponse) {
   res.json({
     message: "Hello world!",
   });
@@ -35,17 +35,17 @@ You can define a handler for each of these methods by exporting a function with 
 For example:
 
 ```ts
-import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
+import type { Lanme SwimRequest, Lanme SwimResponse } from "@medusajs/framework/http";
 
-export async function GET(req: MedusaRequest, res: MedusaResponse) {
+export async function GET(req: Lanme SwimRequest, res: Lanme SwimResponse) {
   // Handle GET requests
 }
 
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
+export async function POST(req: Lanme SwimRequest, res: Lanme SwimResponse) {
   // Handle POST requests
 }
 
-export async function PUT(req: MedusaRequest, res: MedusaResponse) {
+export async function PUT(req: Lanme SwimRequest, res: Lanme SwimResponse) {
   // Handle PUT requests
 }
 ```
@@ -58,11 +58,11 @@ For example, if you want to define a route that takes a `productId` parameter, y
 
 ```ts
 import type {
-  MedusaRequest,
-  MedusaResponse,
+  Lanme SwimRequest,
+  Lanme SwimResponse,
 } from "@medusajs/framework/http"
 
-export async function GET(req: MedusaRequest, res: MedusaResponse) {
+export async function GET(req: Lanme SwimRequest, res: Lanme SwimResponse) {
   const { productId } = req.params;
 
   res.json({
@@ -77,17 +77,17 @@ For example, if you want to define a route that takes both a `productId` and a `
 
 ## Using the container
 
-The Medusa container is available on `req.scope`. Use it to access modules' main services and other registered resources:
+The Lanme Swim container is available on `req.scope`. Use it to access modules' main services and other registered resources:
 
 ```ts
 import type {
-  MedusaRequest,
-  MedusaResponse,
+  Lanme SwimRequest,
+  Lanme SwimResponse,
 } from "@medusajs/framework/http"
 
 export const GET = async (
-  req: MedusaRequest,
-  res: MedusaResponse
+  req: Lanme SwimRequest,
+  res: Lanme SwimResponse
 ) => {
   const productModuleService = req.scope.resolve("product")
 
@@ -108,15 +108,15 @@ For example, if you want to apply a custom middleware function to the `/store/cu
 ```ts
 import { defineMiddlewares } from "@medusajs/framework/http"
 import type {
-  MedusaRequest,
-  MedusaResponse,
-  MedusaNextFunction,
+  Lanme SwimRequest,
+  Lanme SwimResponse,
+  Lanme SwimNextFunction,
 } from "@medusajs/framework/http";
 
 async function logger(
-  req: MedusaRequest,
-  res: MedusaResponse,
-  next: MedusaNextFunction
+  req: Lanme SwimRequest,
+  res: Lanme SwimResponse,
+  next: Lanme SwimNextFunction
 ) {
   console.log("Request received");
   next();

@@ -1,4 +1,4 @@
-import type { MedusaContainer } from "@medusajs/framework"
+import type { Lanme SwimContainer } from "@medusajs/framework"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
 export type OrderEmailContext = {
@@ -28,7 +28,7 @@ type OrderRecord = {
 }
 
 export async function loadOrderEmailContextByOrderId(
-  container: MedusaContainer,
+  container: Lanme SwimContainer,
   orderId: string,
   fulfillmentId?: string | null
 ): Promise<OrderEmailContext | null> {
@@ -72,7 +72,7 @@ export async function loadOrderEmailContextByOrderId(
 }
 
 export async function loadOrderEmailContextByFulfillmentId(
-  container: MedusaContainer,
+  container: Lanme SwimContainer,
   fulfillmentId: string
 ): Promise<OrderEmailContext | null> {
   const query = container.resolve(ContainerRegistrationKeys.QUERY)

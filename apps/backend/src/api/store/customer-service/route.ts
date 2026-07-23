@@ -1,5 +1,5 @@
-import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { MedusaError, Modules } from "@medusajs/framework/utils"
+import type { Lanme SwimRequest, Lanme SwimResponse } from "@medusajs/framework/http"
+import { Lanme SwimError, Modules } from "@medusajs/framework/utils"
 import {
   assertTicketSubmissionAllowed,
   resolveOrderReference,
@@ -8,7 +8,7 @@ import { CUSTOMER_SERVICE_MODULE } from "../../../modules/customer-service"
 import type CustomerServiceModuleService from "../../../modules/customer-service/service"
 import type { StoreCreateCustomerServiceTicketType } from "./validators"
 
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
+export async function POST(req: Lanme SwimRequest, res: Lanme SwimResponse) {
   const body = req.validatedBody as StoreCreateCustomerServiceTicketType
   const customerService = req.scope.resolve(
     CUSTOMER_SERVICE_MODULE
@@ -25,8 +25,8 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
         ? (error as { statusCode: number }).statusCode
         : 429
 
-    throw new MedusaError(
-      MedusaError.Types.NOT_ALLOWED,
+    throw new Lanme SwimError(
+      Lanme SwimError.Types.NOT_ALLOWED,
       error instanceof Error ? error.message : "Too many requests"
     )
   }

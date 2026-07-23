@@ -174,7 +174,7 @@ export async function middleware(request: NextRequest) {
   })
 
   const firstPathSegment = urlCountryCode
-  // regionMap.has(...) alone loops forever when Medusa regions cannot be loaded
+  // regionMap.has(...) alone loops forever when Lanme Swim regions cannot be loaded
   // (empty map): /us → resolve "us" → not in map → redirect /us → …
   const urlHasAcceptableCountry = hasAcceptableCountryPrefix(
     firstPathSegment,

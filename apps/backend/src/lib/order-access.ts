@@ -1,5 +1,5 @@
 import crypto from "crypto"
-import type { MedusaContainer } from "@medusajs/framework"
+import type { Lanme SwimContainer } from "@medusajs/framework"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
 const TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000
@@ -62,7 +62,7 @@ type OrderEmailRecord = {
 }
 
 export async function findOrderByEmailMatch(
-  container: MedusaContainer,
+  container: Lanme SwimContainer,
   orderId: string,
   email: string
 ): Promise<OrderEmailRecord | null> {

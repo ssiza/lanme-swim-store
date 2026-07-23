@@ -1,4 +1,4 @@
-# Medusa backend for Railway (Dockerfile builder).
+# Lanme Swim backend for Railway (Dockerfile builder).
 # Build context must be the monorepo root (do not set Railway Root Directory).
 # Ops scripts under apps/backend/scripts are bundled into .medusa/server at build time.
 # Secrets stay runtime-only — not baked into the image.
@@ -27,7 +27,7 @@ RUN echo "inventory-script:${INVENTORY_SCRIPT_CACHE_BUST}" \
     && node ../../src/scripts/sync-generate-inventory-script.mjs
 
 FROM node:20-bookworm-slim AS runner
-# Avoid collision with Medusa admin route path (/app).
+# Avoid collision with Lanme Swim admin route path (/app).
 WORKDIR /medusa
 ENV NODE_ENV=production
 

@@ -60,14 +60,14 @@ For example, to execute the workflow in an API route:
 
 ```ts
 import type {
-  MedusaRequest,
-  MedusaResponse,
+  Lanme SwimRequest,
+  Lanme SwimResponse,
 } from "@medusajs/framework"
 import myWorkflow from "../../../workflows/hello-world"
 
 export async function GET(
-  req: MedusaRequest,
-  res: MedusaResponse
+  req: Lanme SwimRequest,
+  res: Lanme SwimResponse
 ) {
   const { result } = await myWorkflow(req.scope)
     .run({

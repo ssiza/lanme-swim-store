@@ -2,7 +2,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3"
 import { Upload } from "@aws-sdk/lib-storage"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import type { FileTypes } from "@medusajs/framework/types"
-import { MedusaError } from "@medusajs/framework/utils"
+import { Lanme SwimError } from "@medusajs/framework/utils"
 import { S3FileService } from "@medusajs/file-s3/dist/services/s3-file"
 import path from "path"
 import { PassThrough } from "stream"
@@ -22,12 +22,12 @@ export default class S3NoAclFileService extends S3FileService {
     file: FileTypes.ProviderUploadFileDTO
   ): Promise<FileTypes.ProviderFileResultDTO> {
     if (!file) {
-      throw new MedusaError(MedusaError.Types.INVALID_DATA, "No file provided")
+      throw new Lanme SwimError(Lanme SwimError.Types.INVALID_DATA, "No file provided")
     }
 
     if (!file.filename) {
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
+      throw new Lanme SwimError(
+        Lanme SwimError.Types.INVALID_DATA,
         "No filename provided"
       )
     }
@@ -78,8 +78,8 @@ export default class S3NoAclFileService extends S3FileService {
 
   async getUploadStream(fileData: FileTypes.ProviderUploadStreamDTO) {
     if (!fileData.filename) {
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
+      throw new Lanme SwimError(
+        Lanme SwimError.Types.INVALID_DATA,
         "No filename provided"
       )
     }
@@ -122,8 +122,8 @@ export default class S3NoAclFileService extends S3FileService {
 
   async getPresignedUploadUrl(fileData: FileTypes.ProviderGetPresignedUploadUrlDTO) {
     if (!fileData?.filename) {
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
+      throw new Lanme SwimError(
+        Lanme SwimError.Types.INVALID_DATA,
         "No filename provided"
       )
     }

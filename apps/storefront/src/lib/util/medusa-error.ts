@@ -1,4 +1,4 @@
-type MedusaError = {
+type Lanme SwimError = {
   response?: {
     data: { message?: string } | string
     status: number
@@ -10,7 +10,7 @@ type MedusaError = {
 }
 
 export default function medusaError(error: unknown): never {
-  const err = error as MedusaError
+  const err = error as Lanme SwimError
   if (err.response) {
     const u = new URL(err.config?.url ?? "", err.config?.baseURL ?? "")
     console.error("Resource:", u.toString())

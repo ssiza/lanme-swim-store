@@ -1,6 +1,6 @@
 # Admin Customizations
 
-You can extend the Medusa Admin to add widgets and new pages. Your customizations interact with API routes to provide merchants with custom functionalities.
+You can extend the Lanme Swim Admin to add widgets and new pages. Your customizations interact with API routes to provide merchants with custom functionalities.
 
 > Learn more about Admin Extensions in [this documentation](https://docs.medusajs.com/learn/fundamentals/admin).
 

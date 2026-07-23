@@ -4,9 +4,9 @@ import {
   validateAndTransformBody,
 } from "@medusajs/framework/http"
 import type {
-  MedusaNextFunction,
-  MedusaRequest,
-  MedusaResponse,
+  Lanme SwimNextFunction,
+  Lanme SwimRequest,
+  Lanme SwimResponse,
 } from "@medusajs/framework/http"
 import { StoreCreateCustomerServiceTicket } from "./store/customer-service/validators"
 import { StoreVerifyOrderAccess } from "./store/orders/verify/validators"
@@ -19,9 +19,9 @@ import {
  * CORS for public /storefront/* routes (homepage CMS). Mirrors STORE_CORS.
  */
 function storefrontCors(
-  req: MedusaRequest,
-  res: MedusaResponse,
-  next: MedusaNextFunction
+  req: Lanme SwimRequest,
+  res: Lanme SwimResponse,
+  next: Lanme SwimNextFunction
 ) {
   const storeCors = process.env.STORE_CORS || ""
   const allowed = storeCors

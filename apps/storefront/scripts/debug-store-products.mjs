@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Debug Medusa store product visibility for a country/region.
+ * Debug Lanme Swim store product visibility for a country/region.
  *
  * Usage:
  *   NEXT_PUBLIC_MEDUSA_BACKEND_URL=... \

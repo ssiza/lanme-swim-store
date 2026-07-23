@@ -1,4 +1,4 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { Lanme SwimRequest, Lanme SwimResponse } from "@medusajs/framework/http"
 import { buildHomepagePayload } from "../../../lib/homepage-payload"
 
 /**
@@ -6,7 +6,7 @@ import { buildHomepagePayload } from "../../../lib/homepage-payload"
  * publishable API key. Marketing imagery must still render if the storefront
  * key is misconfigured.
  */
-export async function GET(req: MedusaRequest, res: MedusaResponse) {
+export async function GET(req: Lanme SwimRequest, res: Lanme SwimResponse) {
   const payload = await buildHomepagePayload(req.scope)
   res.json(payload)
 }

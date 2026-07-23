@@ -4,12 +4,12 @@ const requiredEnvs = [
   {
     key: "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY",
     description:
-      "Publishable API key from Medusa Admin → Settings → Publishable API Keys (starts with pk_).",
+      "Publishable API key from Lanme Swim Admin → Settings → Publishable API Keys (starts with pk_).",
   },
   {
     key: "NEXT_PUBLIC_MEDUSA_BACKEND_URL",
     description:
-      "Public URL of the deployed Medusa backend (e.g. https://your-backend.up.railway.app).",
+      "Public URL of the deployed Lanme Swim backend (e.g. https://your-backend.up.railway.app).",
   },
   {
     key: "NEXT_PUBLIC_DEFAULT_REGION",

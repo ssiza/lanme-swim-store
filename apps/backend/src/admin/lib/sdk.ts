@@ -1,6 +1,6 @@
-import Medusa from "@medusajs/js-sdk"
+import Lanme Swim from "@medusajs/js-sdk"
 
-export const sdk = new Medusa({
+export const sdk = new Lanme Swim({
   baseUrl: import.meta.env.VITE_BACKEND_URL || "/",
   debug: import.meta.env.DEV,
   auth: {

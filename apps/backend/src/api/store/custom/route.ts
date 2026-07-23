@@ -1,8 +1,8 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
+import { Lanme SwimRequest, Lanme SwimResponse } from "@medusajs/framework/http";
 
 export async function GET(
-  req: MedusaRequest,
-  res: MedusaResponse
+  req: Lanme SwimRequest,
+  res: Lanme SwimResponse
 ) {
   res.sendStatus(200);
 }

@@ -1,4 +1,4 @@
-import { MedusaContainer } from "@medusajs/framework"
+import { Lanme SwimContainer } from "@medusajs/framework"
 import { linkAllPublishedProductsToStorefrontSalesChannels } from "../lib/storefront-sales-channels"
 
 /**
@@ -8,7 +8,7 @@ import { linkAllPublishedProductsToStorefrontSalesChannels } from "../lib/storef
 export default async function linkProductsToStorefrontSalesChannels({
   container,
 }: {
-  container: MedusaContainer
+  container: Lanme SwimContainer
 }) {
   await linkAllPublishedProductsToStorefrontSalesChannels(container)
 }

@@ -1,4 +1,4 @@
-import { MedusaContainer } from "@medusajs/framework";
+import { Lanme SwimContainer } from "@medusajs/framework";
 import {
   ContainerRegistrationKeys,
   ModuleRegistrationName,
@@ -25,7 +25,7 @@ import {
 export default async function initial_data_seed({
   container,
 }: {
-  container: MedusaContainer;
+  container: Lanme SwimContainer;
 }) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
   const link = container.resolve(ContainerRegistrationKeys.LINK);
@@ -44,7 +44,7 @@ export default async function initial_data_seed({
       salesChannelsData: [
         {
           name: "Default Sales Channel",
-          description: "Created by Medusa",
+          description: "Created by Lanme Swim",
         },
       ],
     },
@@ -325,7 +325,7 @@ export default async function initial_data_seed({
     input: {
       products: [
         {
-          title: "Medusa T-Shirt",
+          title: "Lanme Swim T-Shirt",
           category_ids: [
             categoryResult.find((cat) => cat.name === "Shirts")!.id,
           ],
@@ -512,7 +512,7 @@ export default async function initial_data_seed({
           ],
         },
         {
-          title: "Medusa Sweatshirt",
+          title: "Lanme Swim Sweatshirt",
           category_ids: [
             categoryResult.find((cat) => cat.name === "Sweatshirts")!.id,
           ],
@@ -613,7 +613,7 @@ export default async function initial_data_seed({
           ],
         },
         {
-          title: "Medusa Sweatpants",
+          title: "Lanme Swim Sweatpants",
           category_ids: [
             categoryResult.find((cat) => cat.name === "Pants")!.id,
           ],
@@ -714,7 +714,7 @@ export default async function initial_data_seed({
           ],
         },
         {
-          title: "Medusa Shorts",
+          title: "Lanme Swim Shorts",
           category_ids: [
             categoryResult.find((cat) => cat.name === "Merch")!.id,
           ],

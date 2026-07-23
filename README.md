@@ -3,7 +3,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/59018053/229103275-b5e482bb-4601-46e6-8142-244f531cebdb.svg">
     <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    <img alt="Medusa logo" src="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
+    <img alt="Lanme Swim logo" src="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
     </picture>
   </a>
 </p>
@@ -21,7 +21,7 @@
 </p>
 <p align="center">
   <a href="https://github.com/medusajs/medusa/blob/develop/LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Medusa is released under the MIT license." />
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Lanme Swim is released under the MIT license." />
   </a>
   <a href="https://circleci.com/gh/medusajs/medusa">
     <img src="https://circleci.com/gh/medusajs/medusa.svg?style=shield" alt="Current CircleCI build status." />
@@ -40,13 +40,13 @@
 
 # Lanmè Swim Store
 
-Direct-to-consumer swimwear store for **Lanmè Swim** — bikinis, one-pieces, and beach essentials. Built on Medusa and Next.js with product browsing, cart, checkout, customer accounts, and order management.
+Direct-to-consumer swimwear store for **Lanmè Swim** — bikinis, one-pieces, and beach essentials. Built on Lanme Swim and Next.js with product browsing, cart, checkout, customer accounts, and order management.
 
 > Forked from the Fanarc store monorepo. Configure your own environment variables (Stripe, Resend, S3, database, etc.) before deploying.
 
 ## Features
 
-- All of [Medusa's commerce features](https://docs.medusajs.com/resources/commerce-modules)
+- All of [Lanme Swim's commerce features](https://docs.medusajs.com/resources/commerce-modules)
 - Multi-region support with automatic country detection
 - Product catalog with variant selection
 - Cart with promotion codes
@@ -56,11 +56,11 @@ Direct-to-consumer swimwear store for **Lanmè Swim** — bikinis, one-pieces, a
 
 ## Getting Started
 
-### Deploy with Medusa Cloud
+### Deploy with Lanme Swim Cloud
 
-The fastest way to get started is deploying with [Medusa Cloud](https://cloud.medusajs.com):
+The fastest way to get started is deploying with [Lanme Swim Cloud](https://cloud.medusajs.com):
 
-1. [Create a Medusa Cloud account](https://cloud.medusajs.com)
+1. [Create a Lanme Swim Cloud account](https://cloud.medusajs.com)
 2. Deploy this starter directly from your dashboard
 
 ### Local Installation
@@ -106,7 +106,7 @@ cd apps/backend
 pnpm medusa user -e admin@test.com -p supersecret
 ```
 
-6. Start Medusa backend:
+6. Start Lanme Swim backend:
 
 ```bash
 cd apps/backend
@@ -121,7 +121,7 @@ pnpm dev
 cp apps/storefront/.env.template apps/storefront/.env.local
 ```
 
-9. Update `apps/storefront/.env.local` with your Medusa publishable API key:
+9. Update `apps/storefront/.env.local` with your Lanme Swim publishable API key:
 
 ```bash
 NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_6c3...
@@ -144,7 +144,7 @@ pnpm dev
 
 ## Homepage CMS (admin-managed)
 
-The storefront homepage is photography-first and fully driven from Medusa Admin — nothing is hardcoded for hero/collection/category banners.
+The storefront homepage is photography-first and fully driven from Lanme Swim Admin — nothing is hardcoded for hero/collection/category banners.
 
 | Where in Admin | What you configure |
 |----------------|--------------------|
@@ -152,7 +152,7 @@ The storefront homepage is photography-first and fully driven from Medusa Admin 
 | **Products → Categories → Homepage Banner** | Cover / mobile cover, title, subtitle, display order, featured toggle |
 | **Products → Collections → Homepage Promotion** | Cover / mobile image, promo headline, description, CTA, order, banner + product-rail toggles |
 
-`GET /store/homepage` returns hero slides, featured category banners, and collection blocks. Images upload through Medusa’s upload API (S3 in production).
+`GET /store/homepage` returns hero slides, featured category banners, and collection blocks. Images upload through Lanme Swim’s upload API (S3 in production).
 
 ## Configuration
 
@@ -160,15 +160,15 @@ The storefront is configured via environment variables in `apps/storefront/.env.
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | Publishable API key from your Medusa backend | — |
-| `NEXT_PUBLIC_MEDUSA_BACKEND_URL` | URL of your Medusa backend | `http://localhost:9000` |
+| `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | Publishable API key from your Lanme Swim backend | — |
+| `NEXT_PUBLIC_MEDUSA_BACKEND_URL` | URL of your Lanme Swim backend | `http://localhost:9000` |
 | `NEXT_PUBLIC_DEFAULT_REGION` | Default region country code | `us` |
 | `NEXT_PUBLIC_BASE_URL` | Base URL of the storefront | `https://localhost:8000` |
 | `NEXT_PUBLIC_STRIPE_KEY` | Stripe publishable key (required when Stripe is enabled on a region) | — |
 
 ## Stripe payments
 
-Stripe is wired through Medusa's native payment module. The backend registers the Stripe provider only when `STRIPE_API_KEY` is set; until then, manual/system payment continues to work.
+Stripe is wired through Lanme Swim's native payment module. The backend registers the Stripe provider only when `STRIPE_API_KEY` is set; until then, manual/system payment continues to work.
 
 ### Environment variables
 
@@ -189,7 +189,7 @@ Stripe is wired through Medusa's native payment module. The backend registers th
 
 Seed data enables manual payment only (`pp_system_default`). After setting Stripe env vars and restarting the backend:
 
-1. Open Medusa Admin (`http://localhost:9000/app`).
+1. Open Lanme Swim Admin (`http://localhost:9000/app`).
 2. Go to **Settings → Regions**.
 3. Open your region (e.g. Europe).
 4. Under **Payment Providers**, add **Stripe** (`pp_stripe_stripe`).
@@ -200,7 +200,7 @@ The storefront payment registry already supports `pp_stripe_*` providers — no 
 
 ### Stripe webhooks
 
-Medusa exposes a built-in webhook endpoint (no custom routes required):
+Lanme Swim exposes a built-in webhook endpoint (no custom routes required):
 
 ```
 POST {MEDUSA_BACKEND_URL}/hooks/payment/stripe_stripe
@@ -232,7 +232,7 @@ Without `STRIPE_WEBHOOK_SECRET`, basic card checkout may still work synchronousl
 
 ## File storage
 
-File uploads use Medusa's native file module. The backend picks the provider from environment variables — no code changes are needed for hero or product uploads.
+File uploads use Lanme Swim's native file module. The backend picks the provider from environment variables — no code changes are needed for hero or product uploads.
 
 ### Provider behavior
 
@@ -297,7 +297,7 @@ Existing local files in `apps/backend/static/` are not migrated. When S3 is enab
 }
 ```
 
-3. Grant the IAM user used by Medusa at least `s3:PutObject`, `s3:DeleteObject`, and `s3:GetObject` on the bucket.
+3. Grant the IAM user used by Lanme Swim at least `s3:PutObject`, `s3:DeleteObject`, and `s3:GetObject` on the bucket.
 4. Set all required S3 env vars on the **backend** (Railway).
 5. Set `NEXT_PUBLIC_S3_PUBLIC_URL` on the **storefront** to the same value as `S3_FILE_URL`.
 6. Redeploy the backend and storefront.
@@ -323,19 +323,19 @@ S3_FORCE_PATH_STYLE=true
 
 ### Upload flows
 
-Hero background uploads (Admin widget) and product image uploads both use Medusa's `POST /admin/uploads` endpoint. The active file provider determines where files are stored and what URL is returned.
+Hero background uploads (Admin widget) and product image uploads both use Lanme Swim's `POST /admin/uploads` endpoint. The active file provider determines where files are stored and what URL is returned.
 
 Admin upload size defaults to **10 MB** (`MEDUSA_MAX_UPLOAD_FILE_SIZE_MB` on the backend). The hero widget also resizes large raster images client-side before upload. **Redeploy the backend** after changing the limit — it is baked into the admin build at compile time.
 
 ## Email notifications (Resend)
 
-Transactional email uses Medusa's notification module with a custom Resend provider. Emails are sent from the **backend only** — never from the storefront.
+Transactional email uses Lanme Swim's notification module with a custom Resend provider. Emails are sent from the **backend only** — never from the storefront.
 
 ### Provider behavior
 
 | Condition | Behavior |
 |-----------|----------|
-| `RESEND_API_KEY` **not** set | Default Medusa `notification-local` (`feed` channel); subscribers no-op; no email sent |
+| `RESEND_API_KEY` **not** set | Default Lanme Swim `notification-local` (`feed` channel); subscribers no-op; no email sent |
 | `RESEND_API_KEY` set | Resend provider registered for `email` channel |
 
 ### Environment variables
@@ -393,7 +393,7 @@ Lifecycle emails respect the admin **Send notification** toggle (`no_notificatio
 2. Start backend and storefront.
 3. **Verification:** Register a new customer account — check inbox (or `RESEND_DEV_REDIRECT` target).
 4. **Order confirmation:** Place a test order with manual payment — check inbox after order completes.
-5. **Password reset:** Use the storefront reset page at `/{region}/reset-password?token=...&email=...` or trigger via the Medusa auth API.
+5. **Password reset:** Use the storefront reset page at `/{region}/reset-password?token=...&email=...` or trigger via the Lanme Swim auth API.
 
 ## Railway deployment
 
@@ -435,7 +435,7 @@ Admin dashboard: `https://<backend-service>.up.railway.app/app`
 | Start command | `npx medusa start` |
 | Health check | `GET /health` |
 
-Production image is built with `apps/backend/Dockerfile`: `medusa build` output in a Node 20 slim image. Railway `PORT` is read automatically by the Medusa CLI. Migrations run via `preDeployCommand` before each deploy.
+Production image is built with `apps/backend/Dockerfile`: `medusa build` output in a Node 20 slim image. Railway `PORT` is read automatically by the Lanme Swim CLI. Migrations run via `preDeployCommand` before each deploy.
 
 #### Storefront service
 
@@ -450,7 +450,7 @@ Production image is built with `apps/backend/Dockerfile`: `medusa build` output 
 
 **Docker builds:** Railway does not inject service variables into `RUN` steps automatically. Each `NEXT_PUBLIC_*` variable must be enabled **Available at Build Time** (variable ⋮ menu in Railway). The Dockerfile declares matching `ARG` names so Railway passes them as build-args.
 
-**Health checks:** Railway uses `GET /api/health` (instant liveness). Use `GET /api/ready` to verify the Medusa backend + publishable key after deploy.
+**Health checks:** Railway uses `GET /api/health` (instant liveness). Use `GET /api/ready` to verify the Lanme Swim backend + publishable key after deploy.
 
 ### Backend environment variables
 
@@ -458,7 +458,7 @@ Set these on the **backend** Railway service:
 
 | Variable | Required | Notes |
 |----------|----------|-------|
-| `NODE_ENV` | Yes | `production` (runtime only; the build overrides this so Medusa can load `medusa-config.ts`) |
+| `NODE_ENV` | Yes | `production` (runtime only; the build overrides this so Lanme Swim can load `medusa-config.ts`) |
 | `DATABASE_URL` | Yes | Neon connection string (e.g. `postgresql://user:pass@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require`). Use Neon’s **pooled** URL for the running app; the **direct** URL is optional for one-off migrations if the pooled URL times out. |
 | `REDIS_URL` | Yes | Reference Railway Redis private URL: `${{Redis.REDIS_URL}}` (not the public URL). `family=0` is appended automatically for ioredis. |
 | `JWT_SECRET` | Yes | Strong random string |
@@ -493,14 +493,14 @@ Set these on the **storefront** Railway service. `NEXT_PUBLIC_*` variables must 
 | `NODE_ENV` | Yes | `production` |
 | `NEXT_PUBLIC_MEDUSA_BACKEND_URL` | Yes | Backend Railway URL, e.g. `https://<backend-service>.up.railway.app` |
 | `NEXT_PUBLIC_BASE_URL` | Yes | `https://store.lanmeswim.com` |
-| `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | Yes | From Medusa Admin after deploy |
+| `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | Yes | From Lanme Swim Admin after deploy |
 | `NEXT_PUBLIC_DEFAULT_REGION` | Yes | `us` |
 | `NEXT_PUBLIC_STRIPE_KEY` | Yes | `pk_live_...` |
 | `NEXT_PUBLIC_S3_PUBLIC_URL` | Yes | Must match backend `S3_FILE_URL` |
 
 ### Redis behavior
 
-When `REDIS_URL` is set, the backend registers Medusa Redis modules for cache, event bus, workflow engine, and locking. Without `REDIS_URL`, Medusa falls back to in-memory modules (fine for local dev, not for production).
+When `REDIS_URL` is set, the backend registers Lanme Swim Redis modules for cache, event bus, workflow engine, and locking. Without `REDIS_URL`, Lanme Swim falls back to in-memory modules (fine for local dev, not for production).
 
 ### Deployment sequence
 
@@ -532,7 +532,7 @@ When `REDIS_URL` is set, the backend registers Medusa Redis modules for cache, e
 
 **Healthcheck fails with `relation "tax_provider" does not exist`**
 
-The production database has no Medusa schema yet. Redeploy after ensuring `apps/backend/railway.toml` includes `preDeployCommand`, or run manually:
+The production database has no Lanme Swim schema yet. Redeploy after ensuring `apps/backend/railway.toml` includes `preDeployCommand`, or run manually:
 
 ```bash
 npm run railway:migrate:backend
@@ -549,7 +549,7 @@ npm run railway:migrate:backend
 - Backend uses **`apps/backend/Dockerfile`** instead of Railpack so secrets (`JWT_SECRET`, `COOKIE_SECRET`) are not written into the image at build time.
 - `ADMIN_CORS` and `AUTH_CORS` must be **HTTPS origins** (your backend + storefront URLs), never `DATABASE_URL` or other `postgresql://` strings.
 - `JWT_SECRET` and `COOKIE_SECRET` should be hex-only (`openssl rand -hex 32`).
-- Storefront uses **`apps/storefront/Dockerfile`** instead of Railpack — installs only the storefront workspace (not the full Medusa backend) and produces a smaller standalone Next.js image.
+- Storefront uses **`apps/storefront/Dockerfile`** instead of Railpack — installs only the storefront workspace (not the full Lanme Swim backend) and produces a smaller standalone Next.js image.
 - If a service builds the wrong app, check Root Directory is empty and Config as Code points at the matching `apps/*/railway.toml`.
 
 **Storefront healthcheck fails / crash loop after a successful build**
@@ -560,9 +560,9 @@ npm run railway:migrate:backend
 
 **`ERR_TOO_MANY_REDIRECTS` on the storefront**
 
-- Usually means Medusa `/store/regions` failed (invalid/missing `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`) so the country middleware had an empty region map.
+- Usually means Lanme Swim `/store/regions` failed (invalid/missing `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`) so the country middleware had an empty region map.
 - Check `GET /api/ready` on the storefront — it reports the backend error.
-- Fix: copy a valid publishable key from Medusa Admin → Settings → Publishable API Keys into the storefront service, enable **Available at Build Time**, redeploy.
+- Fix: copy a valid publishable key from Lanme Swim Admin → Settings → Publishable API Keys into the storefront service, enable **Available at Build Time**, redeploy.
 
 ### Local production scripts
 
@@ -577,5 +577,5 @@ npm run railway:start:storefront
 
 ## Resources
 
-- [Medusa Documentation](https://docs.medusajs.com)
-- [Medusa Cloud](https://cloud.medusajs.com)
+- [Lanme Swim Documentation](https://docs.medusajs.com)
+- [Lanme Swim Cloud](https://cloud.medusajs.com)
