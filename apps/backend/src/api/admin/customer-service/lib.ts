@@ -1,4 +1,4 @@
-import type { Lanme SwimRequest, Lanme SwimResponse } from "@medusajs/framework/http"
+import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { CUSTOMER_SERVICE_MODULE } from "../../../modules/customer-service"
 import type CustomerServiceModuleService from "../../../modules/customer-service/service"
 import type { SupportStatus } from "../../../modules/customer-service/constants"

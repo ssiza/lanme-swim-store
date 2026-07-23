@@ -1,5 +1,5 @@
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
-import type { Lanme SwimContainer } from "@medusajs/framework"
+import type { MedusaContainer } from "@medusajs/framework"
 import { getCategoryHomepageSettings } from "./category-homepage-settings"
 import { getCollectionHomepageSettings } from "./collection-homepage-settings"
 import { getFooterSettings } from "./footer-settings"
@@ -57,7 +57,7 @@ const resolveSlide = (slide: HeroSlide, backendUrl: string | null): HeroSlide =>
   mobile_image_url: resolvePublicMediaUrl(slide.mobile_image_url, backendUrl),
 })
 
-export async function buildHomepagePayload(container: Lanme SwimContainer) {
+export async function buildHomepagePayload(container: MedusaContainer) {
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
   const backendUrl =
     process.env.MEDUSA_BACKEND_URL?.replace(/\/$/, "") ||

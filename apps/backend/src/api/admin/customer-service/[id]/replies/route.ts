@@ -1,7 +1,7 @@
 import type {
-  AuthenticatedLanme SwimRequest,
-  Lanme SwimRequest,
-  Lanme SwimResponse,
+  AuthenticatedMedusaRequest,
+  MedusaRequest,
+  MedusaResponse,
 } from "@medusajs/framework/http"
 import { Modules } from "@medusajs/framework/utils"
 import { CUSTOMER_SERVICE_MODULE } from "../../../../../modules/customer-service"
@@ -9,8 +9,8 @@ import type { AdminCreateCustomerServiceReplyType } from "../../validators"
 import { loadTicketWithReplies, type CustomerServiceModule } from "../../lib"
 
 export async function POST(
-  req: AuthenticatedLanme SwimRequest,
-  res: Lanme SwimResponse
+  req: AuthenticatedMedusaRequest,
+  res: MedusaResponse
 ) {
   const { id } = req.params
   const body = req.validatedBody as AdminCreateCustomerServiceReplyType

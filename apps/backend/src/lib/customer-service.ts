@@ -1,4 +1,4 @@
-import type { Lanme SwimContainer } from "@medusajs/framework"
+import type { MedusaContainer } from "@medusajs/framework"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 import {
   MAX_TICKETS_PER_EMAIL_PER_HOUR,
@@ -20,7 +20,7 @@ export function getCustomerServiceAdminEmail() {
 }
 
 export async function resolveOrderReference(
-  container: Lanme SwimContainer,
+  container: MedusaContainer,
   orderNumber?: string | null
 ): Promise<{ order_id: string | null; order_display_id: string | null }> {
   const trimmed = orderNumber?.trim()
@@ -60,7 +60,7 @@ export async function resolveOrderReference(
 }
 
 export async function countRecentTicketsForEmail(
-  container: Lanme SwimContainer,
+  container: MedusaContainer,
   email: string
 ) {
   const customerService = container.resolve("customer_service") as {
@@ -82,7 +82,7 @@ export async function countRecentTicketsForEmail(
 }
 
 export async function assertTicketSubmissionAllowed(
-  container: Lanme SwimContainer,
+  container: MedusaContainer,
   email: string
 ) {
   const recentCount = await countRecentTicketsForEmail(container, email)

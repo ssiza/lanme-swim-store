@@ -1,5 +1,5 @@
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
-import type { Lanme SwimContainer } from "@medusajs/framework"
+import type { MedusaContainer } from "@medusajs/framework"
 
 type RevalidatePayload = {
   productHandle?: string | null
@@ -7,7 +7,7 @@ type RevalidatePayload = {
 }
 
 export async function revalidateStorefrontCache(
-  container: Lanme SwimContainer,
+  container: MedusaContainer,
   payload: RevalidatePayload = {}
 ): Promise<void> {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
@@ -81,7 +81,7 @@ export async function revalidateStorefrontCache(
 }
 
 export async function resolveProductHandle(
-  container: Lanme SwimContainer,
+  container: MedusaContainer,
   productId?: string | null
 ): Promise<string | null> {
   if (!productId) {

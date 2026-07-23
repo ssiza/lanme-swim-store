@@ -1,4 +1,4 @@
-import type { Lanme SwimContainer } from "@medusajs/framework"
+import type { MedusaContainer } from "@medusajs/framework"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import {
   createInventoryItemsWorkflow,
@@ -34,7 +34,7 @@ const STOCK_LOCATION_FIELDS = [
   "sales_channels.name",
 ]
 
-export const resolveStockLocation = async (container: Lanme SwimContainer) => {
+export const resolveStockLocation = async (container: MedusaContainer) => {
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
 
   const { data: stockLocations } = await query.graph({
@@ -120,7 +120,7 @@ export const logInventoryPlan = (
 }
 
 const applyInventoryPlan = async (
-  container: Lanme SwimContainer,
+  container: MedusaContainer,
   plan: VariantInventoryPlan,
   locationId: string,
   summary: InventoryRunSummary
@@ -231,7 +231,7 @@ export const runInventoryGenerationForProducts = async ({
   dryRun,
   defaultStockQuantity = DEFAULT_STOCK_QUANTITY,
 }: {
-  container: Lanme SwimContainer
+  container: MedusaContainer
   products: ProductRecord[]
   dryRun: boolean
   defaultStockQuantity?: number

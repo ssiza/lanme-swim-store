@@ -1,4 +1,4 @@
-import type { Lanme SwimContainer } from "@medusajs/framework"
+import type { MedusaContainer } from "@medusajs/framework"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import {
   createInventoryItemsWorkflow,
@@ -39,7 +39,7 @@ const INVENTORY_ITEM_FIELDS = [
 ]
 
 export const loadInventoryItemsBySkus = async (
-  container: Lanme SwimContainer,
+  container: MedusaContainer,
   skus: string[]
 ) => {
   if (skus.length === 0) {
@@ -77,7 +77,7 @@ export const ensureReusableInventoryItems = async ({
   dryRun,
   summary,
 }: {
-  container: Lanme SwimContainer
+  container: MedusaContainer
   specs: ReusableInventorySpec[]
   locationId: string
   defaultStockQuantity: number
@@ -209,7 +209,7 @@ export const linkVariantToInventoryItem = async ({
   dryRun,
   summary,
 }: {
-  container: Lanme SwimContainer
+  container: MedusaContainer
   variantId: string
   inventoryItemId: string
   dryRun: boolean

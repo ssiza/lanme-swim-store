@@ -1,4 +1,4 @@
-import { Lanme SwimContainer } from "@medusajs/framework"
+import { MedusaContainer } from "@medusajs/framework"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { linkProductsToSalesChannelWorkflow } from "@medusajs/medusa/core-flows"
 
@@ -7,7 +7,7 @@ import { linkProductsToSalesChannelWorkflow } from "@medusajs/medusa/core-flows"
  * Falls back to the store default sales channel when no key links exist.
  */
 export async function getStorefrontSalesChannelIds(
-  container: Lanme SwimContainer
+  container: MedusaContainer
 ): Promise<string[]> {
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
   const storeModule = container.resolve(Modules.STORE)
@@ -47,7 +47,7 @@ export async function getStorefrontSalesChannelIds(
 }
 
 export async function linkProductToStorefrontSalesChannels(
-  container: Lanme SwimContainer,
+  container: MedusaContainer,
   productId: string
 ): Promise<void> {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
@@ -106,7 +106,7 @@ export async function linkProductToStorefrontSalesChannels(
 }
 
 export async function linkAllPublishedProductsToStorefrontSalesChannels(
-  container: Lanme SwimContainer
+  container: MedusaContainer
 ): Promise<void> {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
   const query = container.resolve(ContainerRegistrationKeys.QUERY)

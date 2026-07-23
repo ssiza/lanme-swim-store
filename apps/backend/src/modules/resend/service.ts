@@ -1,6 +1,6 @@
 import {
   AbstractNotificationProviderService,
-  Lanme SwimError,
+  MedusaError,
 } from "@medusajs/framework/utils"
 import type {
   Logger,
@@ -94,15 +94,15 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
 
   static validateOptions(options: Record<string, unknown>) {
     if (!options.api_key) {
-      throw new Lanme SwimError(
-        Lanme SwimError.Types.INVALID_DATA,
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
         "Option `api_key` is required in the Resend notification provider."
       )
     }
 
     if (!options.from) {
-      throw new Lanme SwimError(
-        Lanme SwimError.Types.INVALID_DATA,
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
         "Option `from` is required in the Resend notification provider."
       )
     }
@@ -122,8 +122,8 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
     const allowed = Object.values(EmailTemplates)
 
     if (!allowed.includes(template as EmailTemplates)) {
-      throw new Lanme SwimError(
-        Lanme SwimError.Types.INVALID_DATA,
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
         `Unknown email template "${template}". Valid templates: ${allowed.join(", ")}`
       )
     }
@@ -143,8 +143,8 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
     notification: ProviderSendNotificationDTO
   ): Promise<ProviderSendNotificationResultsDTO> {
     if (!notification) {
-      throw new Lanme SwimError(
-        Lanme SwimError.Types.INVALID_DATA,
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
         "No notification information provided."
       )
     }
@@ -181,15 +181,15 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
       this.logger.error(
         `[order-email] event=resend.send template=${notification.template} recipient=${recipient} order_id=${String((notification.data as Record<string, unknown> | undefined)?.order_id ?? "")} fulfillment_id=${String((notification.data as Record<string, unknown> | undefined)?.fulfillment_id ?? "")} error=${error.message}`
       )
-      throw new Lanme SwimError(
-        Lanme SwimError.Types.UNEXPECTED_STATE,
+      throw new MedusaError(
+        MedusaError.Types.UNEXPECTED_STATE,
         `Failed to send email via Resend: ${error.message}`
       )
     }
 
     if (!data?.id) {
-      throw new Lanme SwimError(
-        Lanme SwimError.Types.UNEXPECTED_STATE,
+      throw new MedusaError(
+        MedusaError.Types.UNEXPECTED_STATE,
         "Failed to send email via Resend: no message id returned."
       )
     }

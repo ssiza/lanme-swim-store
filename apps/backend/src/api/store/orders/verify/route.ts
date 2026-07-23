@@ -1,5 +1,5 @@
-import type { Lanme SwimRequest, Lanme SwimResponse } from "@medusajs/framework/http"
-import { Lanme SwimError } from "@medusajs/framework/utils"
+import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { MedusaError } from "@medusajs/framework/utils"
 import {
   assertOrderVerifyAllowed,
   createOrderAccessToken,
@@ -7,15 +7,15 @@ import {
 } from "../../../../lib/order-access"
 import type { StoreVerifyOrderAccessType } from "./validators"
 
-export async function POST(req: Lanme SwimRequest, res: Lanme SwimResponse) {
+export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const body = req.validatedBody as StoreVerifyOrderAccessType
   const rateLimitKey = `${body.email.trim().toLowerCase()}:${req.ip || "unknown"}`
 
   try {
     assertOrderVerifyAllowed(rateLimitKey)
   } catch (error) {
-    throw new Lanme SwimError(
-      Lanme SwimError.Types.NOT_ALLOWED,
+    throw new MedusaError(
+      MedusaError.Types.NOT_ALLOWED,
       error instanceof Error ? error.message : "Too many requests"
     )
   }
@@ -27,8 +27,8 @@ export async function POST(req: Lanme SwimRequest, res: Lanme SwimResponse) {
   )
 
   if (!order) {
-    throw new Lanme SwimError(
-      Lanme SwimError.Types.NOT_FOUND,
+    throw new MedusaError(
+      MedusaError.Types.NOT_FOUND,
       "We could not verify that order with the email provided."
     )
   }

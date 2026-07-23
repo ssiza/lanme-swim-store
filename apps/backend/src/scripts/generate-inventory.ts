@@ -1,11 +1,11 @@
-import type { Lanme SwimContainer } from "@medusajs/framework"
+import type { MedusaContainer } from "@medusajs/framework"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 import { DEFAULT_STOCK_QUANTITY, type ProductRecord } from "../lib/inventory-generation"
 import { runInventoryGenerationForProducts } from "../lib/inventory-generation-runner"
 import { isDryRun } from "../lib/script-args"
 
 type ScriptInput = {
-  container: Lanme SwimContainer
+  container: MedusaContainer
   args: string[]
 }
 
@@ -28,7 +28,7 @@ const PRODUCT_FIELDS = [
   "variants.inventory_items.inventory.location_levels.stocked_quantity",
 ]
 
-const listAllProducts = async (container: Lanme SwimContainer) => {
+const listAllProducts = async (container: MedusaContainer) => {
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
   const products: ProductRecord[] = []
   const take = 50

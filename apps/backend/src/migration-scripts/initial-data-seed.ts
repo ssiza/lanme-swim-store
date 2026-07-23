@@ -1,4 +1,4 @@
-import { Lanme SwimContainer } from "@medusajs/framework";
+import { MedusaContainer } from "@medusajs/framework";
 import {
   ContainerRegistrationKeys,
   ModuleRegistrationName,
@@ -25,7 +25,7 @@ import {
 export default async function initial_data_seed({
   container,
 }: {
-  container: Lanme SwimContainer;
+  container: MedusaContainer;
 }) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
   const link = container.resolve(ContainerRegistrationKeys.LINK);

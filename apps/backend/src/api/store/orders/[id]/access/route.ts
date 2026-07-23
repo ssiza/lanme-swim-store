@@ -1,6 +1,6 @@
-import type { Lanme SwimRequest, Lanme SwimResponse } from "@medusajs/framework/http"
+import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { getOrderDetailWorkflow } from "@medusajs/core-flows"
-import { Lanme SwimError } from "@medusajs/framework/utils"
+import { MedusaError } from "@medusajs/framework/utils"
 import { verifyOrderAccessToken } from "../../../../../lib/order-access"
 
 const ORDER_DETAIL_FIELDS = [
@@ -32,13 +32,13 @@ const ORDER_DETAIL_FIELDS = [
   "fulfillments.*",
 ]
 
-export async function GET(req: Lanme SwimRequest, res: Lanme SwimResponse) {
+export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const orderId = req.params.id
   const accessToken = req.headers["x-order-access-token"]
 
   if (typeof accessToken !== "string" || !accessToken.length) {
-    throw new Lanme SwimError(
-      Lanme SwimError.Types.UNAUTHORIZED,
+    throw new MedusaError(
+      MedusaError.Types.UNAUTHORIZED,
       "Order access token is required."
     )
   }
@@ -46,8 +46,8 @@ export async function GET(req: Lanme SwimRequest, res: Lanme SwimResponse) {
   const verified = verifyOrderAccessToken(orderId, accessToken)
 
   if (!verified) {
-    throw new Lanme SwimError(
-      Lanme SwimError.Types.UNAUTHORIZED,
+    throw new MedusaError(
+      MedusaError.Types.UNAUTHORIZED,
       "Order access token is invalid or expired."
     )
   }
@@ -64,14 +64,14 @@ export async function GET(req: Lanme SwimRequest, res: Lanme SwimResponse) {
   })
 
   if (!result?.id) {
-    throw new Lanme SwimError(Lanme SwimError.Types.NOT_FOUND, "Order not found.")
+    throw new MedusaError(MedusaError.Types.NOT_FOUND, "Order not found.")
   }
 
   if (
     result.email?.trim().toLowerCase() !== verified.email.trim().toLowerCase()
   ) {
-    throw new Lanme SwimError(
-      Lanme SwimError.Types.UNAUTHORIZED,
+    throw new MedusaError(
+      MedusaError.Types.UNAUTHORIZED,
       "Order access token is invalid for this order."
     )
   }

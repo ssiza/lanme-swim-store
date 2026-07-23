@@ -1,9 +1,9 @@
-import type { Lanme SwimRequest, Lanme SwimResponse } from "@medusajs/framework/http"
+import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { CUSTOMER_SERVICE_MODULE } from "../../../modules/customer-service"
 import type { SupportStatus } from "../../../modules/customer-service/constants"
 import type { CustomerServiceModule } from "./lib"
 
-export async function GET(req: Lanme SwimRequest, res: Lanme SwimResponse) {
+export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const customerService = req.scope.resolve(
     CUSTOMER_SERVICE_MODULE
   ) as CustomerServiceModule

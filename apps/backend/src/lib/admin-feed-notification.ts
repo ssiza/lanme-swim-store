@@ -1,4 +1,4 @@
-import type { Lanme SwimContainer } from "@medusajs/framework"
+import type { MedusaContainer } from "@medusajs/framework"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 
 export type AdminFeedNotificationInput = {
@@ -17,7 +17,7 @@ export const buildAdminOrderUrl = (orderId: string) => {
 }
 
 export async function createAdminFeedNotification(
-  container: Lanme SwimContainer,
+  container: MedusaContainer,
   input: AdminFeedNotificationInput
 ) {
   const notificationModuleService = container.resolve(Modules.NOTIFICATION)
@@ -36,7 +36,7 @@ export async function createAdminFeedNotification(
 }
 
 export async function createOrderPlacedAdminFeedNotification(
-  container: Lanme SwimContainer,
+  container: MedusaContainer,
   orderId: string
 ) {
   const query = container.resolve(ContainerRegistrationKeys.QUERY)

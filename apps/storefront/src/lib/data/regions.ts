@@ -9,21 +9,15 @@ import {
 import { logRegionResolution } from "@lib/util/region-resolution"
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
-import { getCacheOptions } from "./cookies"
 
 export const listRegions = async () => {
   logFetchStart("listRegions")
-
-  const next = {
-    ...(await getCacheOptions("regions")),
-  }
 
   try {
     const regions = await sdk.client
       .fetch<{ regions: HttpTypes.StoreRegion[] }>(`/store/regions`, {
         method: "GET",
-        next,
-        cache: "force-cache",
+        cache: "no-store",
       })
       .then(({ regions }) => regions ?? [])
 
@@ -44,16 +38,11 @@ export const listRegions = async () => {
 export const retrieveRegion = async (id: string) => {
   logFetchStart("retrieveRegion", { regionId: id })
 
-  const next = {
-    ...(await getCacheOptions(["regions", id].join("-"))),
-  }
-
   try {
     return await sdk.client
       .fetch<{ region: HttpTypes.StoreRegion }>(`/store/regions/${id}`, {
         method: "GET",
-        next,
-        cache: "force-cache",
+        cache: "no-store",
       })
       .then(({ region }) => region)
   } catch (error) {

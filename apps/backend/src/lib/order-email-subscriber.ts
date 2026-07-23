@@ -1,4 +1,4 @@
-import type { Lanme SwimContainer } from "@medusajs/framework"
+import type { MedusaContainer } from "@medusajs/framework"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 import {
   loadOrderEmailContextByFulfillmentId,
@@ -17,7 +17,7 @@ import {
 type LifecycleSubscriberInput = {
   eventName: string
   template: OrderLifecycleEmailTemplate
-  container: Lanme SwimContainer
+  container: MedusaContainer
   no_notification?: boolean
   order_id?: string
   fulfillment_id?: string
