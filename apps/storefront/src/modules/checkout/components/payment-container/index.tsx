@@ -93,7 +93,7 @@ export const StripeCardContainer = ({
   useEffect(() => {
     if (isSelected && waitedTooLong && !stripeReady) {
       setError(
-        "The card form did not load. Confirm NEXT_PUBLIC_STRIPE_KEY is set for the storefront build, or choose Manual payment."
+        "The card form did not load. Refresh the page and try again, or choose Manual payment if available."
       )
     }
   }, [isSelected, waitedTooLong, stripeReady, setError])

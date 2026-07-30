@@ -1,4 +1,4 @@
-import { retrieveCart } from "@lib/data/cart"
+import { retrieveCheckoutCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
@@ -11,7 +11,9 @@ export const metadata: Metadata = {
 }
 
 export default async function Checkout() {
-  const cart = await retrieveCart()
+  // Always fetch a fresh cart so payment_sessions.client_secret is visible
+  // after initiatePaymentSession + router.refresh().
+  const cart = await retrieveCheckoutCart()
 
   if (!cart) {
     return notFound()
