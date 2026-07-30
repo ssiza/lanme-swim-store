@@ -561,6 +561,11 @@ npm run railway:migrate:backend
 - Storefront uses **`apps/storefront/Dockerfile`** instead of Railpack — installs only the storefront workspace (not the full Lanme Swim backend) and produces a smaller standalone Next.js image.
 - If a service builds the wrong app, check Root Directory is empty and Config as Code points at the matching `apps/*/railway.toml`.
 
+**Backend build fails with `npm error 429 Too Many Requests`**
+
+- This hits after Medusa compile, during `npm install` inside `.medusa/server` (a second registry pull). The Dockerfile retries with backoff and `--prefer-offline` using the earlier `npm ci` cache.
+- Redeploy once; if 429s persist, wait a few minutes and redeploy again (npm registry rate limits on shared builder IPs).
+
 **Storefront healthcheck fails / crash loop after a successful build**
 
 - Confirm Config as Code is `/apps/storefront/railway.toml` (not the root `railway.toml`, which builds the backend).
