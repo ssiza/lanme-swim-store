@@ -182,7 +182,12 @@ const Payment = ({
   // Prefer a ready payment method when the payment step opens so customers are
   // not stuck with an empty selection (especially when Stripe is the only option).
   useEffect(() => {
-    if (!isOpen || paidByGiftcard || selectedPaymentMethod) {
+    if (
+      !isOpen ||
+      paidByGiftcard ||
+      selectedPaymentMethod ||
+      activeSession?.provider_id
+    ) {
       return
     }
 
@@ -196,7 +201,8 @@ const Payment = ({
           return false
         }
         return true
-      }) ?? availablePaymentMethods.find((method) =>
+      }) ??
+      availablePaymentMethods.find((method) =>
         getPaymentProviderConfig(method.id).isSupported
       )
 
@@ -215,6 +221,7 @@ const Payment = ({
     isOpen,
     paidByGiftcard,
     selectedPaymentMethod,
+    activeSession?.provider_id,
     availablePaymentMethods,
     stripeKeyConfigured,
   ])
