@@ -52,9 +52,13 @@ export async function enableStripeOnRegions(
   let linked = 0
 
   for (const region of regions) {
-    const existing = (region.payment_providers ?? []).map(
-      (provider: { id?: string }) => provider.id
-    )
+    if (!region) {
+      continue
+    }
+
+    const existing = (region.payment_providers ?? [])
+      .map((provider) => provider?.id)
+      .filter((id): id is string => Boolean(id))
 
     if (existing.includes(STRIPE_PROVIDER_ID)) {
       continue

@@ -52,7 +52,10 @@ export const POST = async (
       input,
     })
 
-    res.status(200).json({ user: users[0] })
+    // Workflow returns UserDTO (Date fields); Admin API expects AdminUser (ISO strings).
+    res.status(200).json({
+      user: users[0] as unknown as HttpTypes.AdminUser,
+    })
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unable to accept invite."
