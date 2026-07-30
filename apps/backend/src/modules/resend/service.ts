@@ -18,6 +18,7 @@ import { passwordResetEmail } from "./emails/password-reset"
 import { supportTicketAdminNotificationEmail } from "./emails/support-ticket-admin-notification"
 import { supportTicketConfirmationEmail } from "./emails/support-ticket-confirmation"
 import { supportTicketReplyEmail } from "./emails/support-ticket-reply"
+import { userInvitedEmail } from "./emails/user-invited"
 import { verificationEmail } from "./emails/verification"
 
 export enum EmailTemplates {
@@ -30,6 +31,7 @@ export enum EmailTemplates {
   SUPPORT_TICKET_CONFIRMATION = "support-ticket-confirmation",
   SUPPORT_TICKET_ADMIN_NOTIFICATION = "support-ticket-admin-notification",
   SUPPORT_TICKET_REPLY = "support-ticket-reply",
+  USER_INVITED = "user-invited",
 }
 
 const templates: Record<
@@ -49,6 +51,7 @@ const templates: Record<
     supportTicketAdminNotificationEmail(props),
   [EmailTemplates.SUPPORT_TICKET_REPLY]: (props) =>
     supportTicketReplyEmail(props),
+  [EmailTemplates.USER_INVITED]: (props) => userInvitedEmail(props),
 }
 
 const templateSubjects: Record<EmailTemplates, string> = {
@@ -64,6 +67,7 @@ const templateSubjects: Record<EmailTemplates, string> = {
   [EmailTemplates.SUPPORT_TICKET_ADMIN_NOTIFICATION]:
     "New Lanmè Swim customer service request",
   [EmailTemplates.SUPPORT_TICKET_REPLY]: "Reply from Lanmè Swim support",
+  [EmailTemplates.USER_INVITED]: "You're invited to the Lanmè Swim admin",
 }
 
 export type ResendNotificationOptions = {
