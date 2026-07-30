@@ -187,16 +187,22 @@ Stripe is wired through Lanme Swim's native payment module. The backend register
 
 ### Enable Stripe in Admin
 
-Seed data enables manual payment only (`pp_system_default`). After setting Stripe env vars and restarting the backend:
+On deploy, `medusa db:migrate` runs a migration that links Stripe (`pp_stripe_stripe`) to every region when `STRIPE_API_KEY` is set. You can still manage providers manually:
 
 1. Open Lanme Swim Admin (`http://localhost:9000/app`).
 2. Go to **Settings → Regions**.
 3. Open your region (e.g. Europe).
-4. Under **Payment Providers**, add **Stripe** (`pp_stripe_stripe`).
+4. Under **Payment Providers**, confirm **Stripe** (`pp_stripe_stripe`) is listed.
 5. Keep **System (Manual)** enabled if you still want manual payments in development.
 6. Save the region.
 
 The storefront payment registry already supports `pp_stripe_*` providers — no checkout code changes are needed once the region is configured.
+
+To re-run the linker locally:
+
+```bash
+cd apps/backend && npx medusa exec ./src/scripts/enable-stripe-on-regions.ts
+```
 
 ### Stripe webhooks
 
@@ -563,6 +569,12 @@ npm run railway:migrate:backend
 - Usually means Lanme Swim `/store/regions` failed (invalid/missing `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`) so the country middleware had an empty region map.
 - Check `GET /api/ready` on the storefront — it reports the backend error.
 - Fix: copy a valid publishable key from Lanme Swim Admin → Settings → Publishable API Keys into the storefront service, enable **Available at Build Time**, redeploy.
+
+**Checkout stuck before payment / card form never appears**
+
+- Confirm backend has `STRIPE_API_KEY` and storefront has `NEXT_PUBLIC_STRIPE_KEY` with **Available at Build Time**, then **Redeploy** the storefront (publishable keys are baked in at `next build`).
+- Confirm Stripe is linked on the region (Admin → Settings → Regions), or check backend logs for `Enabled Stripe (pp_stripe_stripe) on region…` after boot.
+- Selecting Stripe must initialize a payment session so Stripe Elements can mount — if the card field stays on a skeleton, refresh the payment step or re-select Stripe.
 
 ### Local production scripts
 

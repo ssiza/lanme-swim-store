@@ -5,6 +5,7 @@ import Addresses from "@modules/checkout/components/addresses"
 import Payment from "@modules/checkout/components/payment"
 import Review from "@modules/checkout/components/review"
 import Shipping from "@modules/checkout/components/shipping"
+import { Text } from "@modules/common/components/ui"
 
 export default async function CheckoutForm({
   cart,
@@ -20,8 +21,13 @@ export default async function CheckoutForm({
   const shippingMethods = await listCartShippingMethods(cart.id)
   const paymentMethods = await listCartPaymentMethods(cart.region?.id ?? "")
 
-  if (!shippingMethods || !paymentMethods) {
-    return null
+  if (!shippingMethods) {
+    return (
+      <Text className="txt-medium text-ui-fg-subtle">
+        Delivery options could not be loaded for this cart. Check that shipping
+        is configured for your region, then refresh and try again.
+      </Text>
+    )
   }
 
   return (
@@ -30,7 +36,10 @@ export default async function CheckoutForm({
 
       <Shipping cart={cart} availableShippingMethods={shippingMethods} />
 
-      <Payment cart={cart} availablePaymentMethods={paymentMethods} />
+      <Payment
+        cart={cart}
+        availablePaymentMethods={paymentMethods ?? []}
+      />
 
       <Review cart={cart} />
     </div>
