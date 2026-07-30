@@ -22,17 +22,37 @@ import {
 import { getRegion } from "./regions"
 import { getLocale } from "./locale-actions"
 
+const DEFAULT_CART_FIELDS =
+  "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, *promotions, *shipping_methods, +shipping_methods.name, *payment_collection, *payment_collection.payment_sessions"
+
+async function revalidateCartTag() {
+  const cartCacheTag = await getCacheTag("carts")
+  if (cartCacheTag) {
+    revalidateTag(cartCacheTag)
+  }
+}
+
+async function revalidateFulfillmentTag() {
+  const fulfillmentCacheTag = await getCacheTag("fulfillment")
+  if (fulfillmentCacheTag) {
+    revalidateTag(fulfillmentCacheTag)
+  }
+}
+
 /**
  * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
  * @param cartId - optional - The ID of the cart to retrieve.
  * @returns The cart object if found, or null if not found.
  */
-export async function retrieveCart(cartId?: string, fields?: string) {
+export async function retrieveCart(
+  cartId?: string,
+  fields?: string,
+  options?: { cache?: RequestCache }
+) {
   logFetchStart("retrieveCart", { cartId: cartId ?? null })
 
   const id = cartId || (await getCartId())
-  fields ??=
-    "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name, *payment_collection, *payment_collection.payment_sessions"
+  fields ??= DEFAULT_CART_FIELDS
 
   if (!id) {
     logFetchEnd("retrieveCart", { reason: "no_cart_id", found: false })
@@ -47,6 +67,12 @@ export async function retrieveCart(cartId?: string, fields?: string) {
     ...(await getCacheOptions("carts")),
   }
 
+  // Without cache tags, force-cache can never be invalidated after payment /
+  // shipping mutations — checkout then never sees client_secret / methods.
+  const cache: RequestCache =
+    options?.cache ??
+    (Object.keys(next).length > 0 ? "force-cache" : "no-store")
+
   return await sdk.client
     .fetch<HttpTypes.StoreCartResponse>(`/store/carts/${id}`, {
       method: "GET",
@@ -55,7 +81,7 @@ export async function retrieveCart(cartId?: string, fields?: string) {
       },
       headers,
       next,
-      cache: "force-cache",
+      cache,
     })
     .then(({ cart }: { cart: HttpTypes.StoreCart }) => {
       logFetchEnd("retrieveCart", { cartId: id, found: Boolean(cart) })
@@ -65,6 +91,11 @@ export async function retrieveCart(cartId?: string, fields?: string) {
       logFetchError("retrieveCart", error, { cartId: id })
       return null
     })
+}
+
+/** Fresh cart for checkout — never serve a stale payment session / shipping method. */
+export async function retrieveCheckoutCart() {
+  return retrieveCart(undefined, DEFAULT_CART_FIELDS, { cache: "no-store" })
 }
 
 export async function getOrSetCart(countryCode: string) {
@@ -91,14 +122,12 @@ export async function getOrSetCart(countryCode: string) {
 
     await setCartId(cart.id)
 
-    const cartCacheTag = await getCacheTag("carts")
-    revalidateTag(cartCacheTag)
+    await revalidateCartTag()
   }
 
   if (cart && cart?.region_id !== region.id) {
     await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, headers)
-    const cartCacheTag = await getCacheTag("carts")
-    revalidateTag(cartCacheTag)
+    await revalidateCartTag()
   }
 
   return cart
@@ -118,11 +147,8 @@ export async function updateCart(data: HttpTypes.StoreUpdateCart) {
   return sdk.store.cart
     .update(cartId, data, {}, headers)
     .then(async ({ cart }: { cart: HttpTypes.StoreCart }) => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
-
-      const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      revalidateTag(fulfillmentCacheTag)
+      await revalidateCartTag()
+      await revalidateFulfillmentTag()
 
       return cart
     })
@@ -163,11 +189,8 @@ export async function addToCart({
       headers
     )
     .then(async () => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
-
-      const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      revalidateTag(fulfillmentCacheTag)
+      await revalidateCartTag()
+      await revalidateFulfillmentTag()
     })
     .catch(medusaError)
 }
@@ -196,11 +219,8 @@ export async function updateLineItem({
   await sdk.store.cart
     .updateLineItem(cartId, lineId, { quantity }, {}, headers)
     .then(async () => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
-
-      const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      revalidateTag(fulfillmentCacheTag)
+      await revalidateCartTag()
+      await revalidateFulfillmentTag()
     })
     .catch(medusaError)
 }
@@ -223,11 +243,8 @@ export async function deleteLineItem(lineId: string) {
   await sdk.store.cart
     .deleteLineItem(cartId, lineId, {}, headers)
     .then(async () => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
-
-      const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      revalidateTag(fulfillmentCacheTag)
+      await revalidateCartTag()
+      await revalidateFulfillmentTag()
     })
     .catch(medusaError)
 }
@@ -246,8 +263,7 @@ export async function setShippingMethod({
   return sdk.store.cart
     .addShippingMethod(cartId, { option_id: shippingMethodId }, {}, headers)
     .then(async () => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      await revalidateCartTag()
     })
     .catch(medusaError)
 }
@@ -263,8 +279,7 @@ export async function initiatePaymentSession(
   return sdk.store.payment
     .initiatePaymentSession(cart, data, {}, headers)
     .then(async (resp) => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      await revalidateCartTag()
       return resp
     })
     .catch(medusaError)
@@ -284,11 +299,8 @@ export async function applyPromotions(codes: string[]) {
   return sdk.store.cart
     .update(cartId, { promo_codes: codes }, {}, headers)
     .then(async () => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
-
-      const fulfillmentCacheTag = await getCacheTag("fulfillment")
-      revalidateTag(fulfillmentCacheTag)
+      await revalidateCartTag()
+      await revalidateFulfillmentTag()
     })
     .catch(medusaError)
 }
@@ -420,8 +432,7 @@ export async function placeOrder(cartId?: string) {
   const cartRes = await sdk.store.cart
     .complete(id, {}, headers)
     .then(async (cartRes) => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
+      await revalidateCartTag()
       return cartRes
     })
     .catch(medusaError)
@@ -455,8 +466,7 @@ export async function updateRegion(countryCode: string, currentPath: string) {
 
   if (cartId) {
     await updateCart({ region_id: region.id })
-    const cartCacheTag = await getCacheTag("carts")
-    revalidateTag(cartCacheTag)
+    await revalidateCartTag()
   }
 
   const regionCacheTag = await getCacheTag("regions")

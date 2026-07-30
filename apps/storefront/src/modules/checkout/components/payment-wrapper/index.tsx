@@ -46,7 +46,17 @@ const PaymentWrapper: React.FC<PaymentWrapperProps> = ({ cart, children }) => {
     providerConfig.requiresStripeElements && Boolean(paymentSession)
   const missingStripeKey = needsStripe && (!stripeKey || !stripePromise)
 
-  if (needsStripe && stripeKey && stripePromise && paymentSession) {
+  const clientSecret = paymentSession?.data?.client_secret as
+    | string
+    | undefined
+
+  if (
+    needsStripe &&
+    stripeKey &&
+    stripePromise &&
+    paymentSession &&
+    clientSecret
+  ) {
     return (
       <StripeWrapper
         paymentSession={paymentSession}
