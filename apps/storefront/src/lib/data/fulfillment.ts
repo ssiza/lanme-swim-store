@@ -13,6 +13,8 @@ export const listCartShippingMethods = async (cartId: string) => {
     ...(await getCacheOptions("fulfillment")),
   }
 
+  // Checkout shipping options depend on the current cart address/region.
+  // Never serve a stale empty list after the customer updates their address.
   return sdk.client
     .fetch<HttpTypes.StoreShippingOptionListResponse>(
       `/store/shipping-options`,
@@ -23,7 +25,7 @@ export const listCartShippingMethods = async (cartId: string) => {
         },
         headers,
         next,
-        cache: "force-cache",
+        cache: "no-store",
       }
     )
     .then(({ shipping_options }) => shipping_options)
@@ -59,6 +61,7 @@ export const calculatePriceForShippingOption = async (
         body,
         headers,
         next,
+        cache: "no-store",
       }
     )
     .then(({ shipping_option }) => shipping_option)

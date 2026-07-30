@@ -23,14 +23,16 @@ const stripePromise = stripeKey
     )
   : null
 
-const MissingStripeKey = () => (
-  <div className="content-container py-8">
-    <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-      Stripe is selected for this cart, but{" "}
-      <code className="font-mono">NEXT_PUBLIC_STRIPE_KEY</code> is missing from
-      the storefront build. Set the publishable key on the storefront service,
-      enable <strong>Available at Build Time</strong> in Railway, and redeploy.
-    </div>
+export const isStripePublishableKeyConfigured = () => Boolean(stripeKey)
+
+const MissingStripeKeyBanner = () => (
+  <div className="mb-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+    Card payments need{" "}
+    <code className="font-mono">NEXT_PUBLIC_STRIPE_KEY</code> on the storefront
+    build. Set the Stripe publishable key, enable{" "}
+    <strong>Available at Build Time</strong> in Railway, and redeploy the
+    storefront. You can still choose Manual payment if it is enabled for this
+    region.
   </div>
 )
 
@@ -40,12 +42,11 @@ const PaymentWrapper: React.FC<PaymentWrapperProps> = ({ cart, children }) => {
   )
 
   const providerConfig = getPaymentProviderConfig(paymentSession?.provider_id)
+  const needsStripe =
+    providerConfig.requiresStripeElements && Boolean(paymentSession)
+  const missingStripeKey = needsStripe && (!stripeKey || !stripePromise)
 
-  if (providerConfig.requiresStripeElements && paymentSession) {
-    if (!stripeKey || !stripePromise) {
-      return <MissingStripeKey />
-    }
-
+  if (needsStripe && stripeKey && stripePromise && paymentSession) {
     return (
       <StripeWrapper
         paymentSession={paymentSession}
@@ -57,7 +58,12 @@ const PaymentWrapper: React.FC<PaymentWrapperProps> = ({ cart, children }) => {
     )
   }
 
-  return <div>{children}</div>
+  return (
+    <div>
+      {missingStripeKey && <MissingStripeKeyBanner />}
+      {children}
+    </div>
+  )
 }
 
 export default PaymentWrapper

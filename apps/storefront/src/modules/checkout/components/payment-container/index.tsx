@@ -1,6 +1,6 @@
 import { Radio as RadioGroupOption } from "@headlessui/react"
 import { Text, clx } from "@modules/common/components/ui"
-import React, { useContext, useMemo } from "react"
+import React, { useContext, useEffect, useMemo, useState } from "react"
 
 import Radio from "@modules/common/components/radio"
 
@@ -77,6 +77,26 @@ export const StripeCardContainer = ({
   setCardComplete: (complete: boolean) => void
 }) => {
   const stripeReady = useContext(StripeContext)
+  const [waitedTooLong, setWaitedTooLong] = useState(false)
+  const isSelected = selectedPaymentOptionId === paymentProviderId
+
+  useEffect(() => {
+    if (!isSelected || stripeReady) {
+      setWaitedTooLong(false)
+      return
+    }
+
+    const timer = window.setTimeout(() => setWaitedTooLong(true), 8000)
+    return () => window.clearTimeout(timer)
+  }, [isSelected, stripeReady])
+
+  useEffect(() => {
+    if (isSelected && waitedTooLong && !stripeReady) {
+      setError(
+        "The card form did not load. Confirm NEXT_PUBLIC_STRIPE_KEY is set for the storefront build, or choose Manual payment."
+      )
+    }
+  }, [isSelected, waitedTooLong, stripeReady, setError])
 
   const useOptions: StripeCardElementOptions = useMemo(() => {
     return {
@@ -102,7 +122,7 @@ export const StripeCardContainer = ({
       selectedPaymentOptionId={selectedPaymentOptionId}
       disabled={disabled}
     >
-      {selectedPaymentOptionId === paymentProviderId &&
+      {isSelected &&
         (stripeReady ? (
           <div className="my-4 transition-all duration-150 ease-in-out">
             <Text className="txt-medium-plus text-ui-fg-base mb-1">
@@ -123,7 +143,9 @@ export const StripeCardContainer = ({
           <div className="my-4">
             <SkeletonCardDetails />
             <Text className="txt-small text-ui-fg-muted mt-2">
-              Preparing secure card form…
+              {waitedTooLong
+                ? "Card form is taking too long. Try Manual payment or redeploy the storefront with NEXT_PUBLIC_STRIPE_KEY."
+                : "Preparing secure card form…"}
             </Text>
           </div>
         ))}

@@ -372,6 +372,13 @@ const Shipping: React.FC<ShippingProps> = ({
           )}
 
           <div>
+            {!_shippingMethods?.length && !hasPickupOptions && (
+              <Text className="txt-medium text-ui-fg-subtle mb-4">
+                No delivery options are available for this address. Confirm the
+                shipping country is in your store region and that shipping
+                options are configured in Admin.
+              </Text>
+            )}
             <ErrorMessage
               error={error}
               data-testid="delivery-option-error-message"

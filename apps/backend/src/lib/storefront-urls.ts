@@ -2,7 +2,7 @@ const getStorefrontBaseUrl = () =>
   (process.env.STOREFRONT_URL || "http://localhost:8000").replace(/\/$/, "")
 
 const getStoreDefaultRegion = () =>
-  process.env.STORE_DEFAULT_REGION?.toLowerCase() || "us"
+  process.env.STORE_DEFAULT_REGION?.toLowerCase() || "gb"
 
 export const buildVerifyAccountUrl = (code: string) => {
   const base = getStorefrontBaseUrl()

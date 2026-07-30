@@ -162,7 +162,7 @@ The storefront is configured via environment variables in `apps/storefront/.env.
 |----------|-------------|---------|
 | `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | Publishable API key from your Lanme Swim backend | — |
 | `NEXT_PUBLIC_MEDUSA_BACKEND_URL` | URL of your Lanme Swim backend | `http://localhost:9000` |
-| `NEXT_PUBLIC_DEFAULT_REGION` | Default region country code | `us` |
+| `NEXT_PUBLIC_DEFAULT_REGION` | Default region country code (must exist on a Medusa region; seed uses Europe — prefer `gb`) | `gb` |
 | `NEXT_PUBLIC_BASE_URL` | Base URL of the storefront | `https://localhost:8000` |
 | `NEXT_PUBLIC_STRIPE_KEY` | Stripe publishable key (required when Stripe is enabled on a region) | — |
 
@@ -356,7 +356,7 @@ Transactional email uses Lanme Swim's notification module with a custom Resend p
 | `RESEND_REPLY_TO` | Optional | Reply-to / support address |
 | `RESEND_DEV_REDIRECT` | Optional | Send all mail to this inbox in development |
 | `STOREFRONT_URL` | Recommended | Base storefront URL for email links (`http://localhost:8000`) |
-| `STORE_DEFAULT_REGION` | Optional | Region path segment for links (default: `us`) |
+| `STORE_DEFAULT_REGION` | Optional | Region path segment for links (default: `gb`) |
 
 ### Development setup
 
@@ -478,7 +478,7 @@ Set these on the **backend** Railway service:
 | `STOREFRONT_URL` | Yes | `https://store.lanmeswim.com` |
 | `MEDUSA_BACKEND_URL` | Yes | Same as backend Railway URL |
 | `MEDUSA_MAX_UPLOAD_FILE_SIZE_MB` | Optional | Admin upload limit in MB (default `10`) |
-| `STORE_DEFAULT_REGION` | Yes | `us` |
+| `STORE_DEFAULT_REGION` | Yes | `gb` (or another seeded Europe country) |
 | `STRIPE_API_KEY` | Yes | `sk_live_...` |
 | `STRIPE_WEBHOOK_SECRET` | Yes | `whsec_...` from Stripe webhook |
 | `RESEND_API_KEY` | Yes | Resend API key |
@@ -503,7 +503,7 @@ Set these on the **storefront** Railway service. `NEXT_PUBLIC_*` variables must 
 | `NEXT_PUBLIC_MEDUSA_BACKEND_URL` | Yes | Backend Railway URL, e.g. `https://<backend-service>.up.railway.app` |
 | `NEXT_PUBLIC_BASE_URL` | Yes | `https://store.lanmeswim.com` |
 | `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | Yes | From Lanme Swim Admin after deploy |
-| `NEXT_PUBLIC_DEFAULT_REGION` | Yes | `us` |
+| `NEXT_PUBLIC_DEFAULT_REGION` | Yes | `gb` (must match a country on your Medusa region) |
 | `NEXT_PUBLIC_STRIPE_KEY` | Yes | `pk_live_...` |
 | `NEXT_PUBLIC_S3_PUBLIC_URL` | Yes | Must match backend `S3_FILE_URL` |
 
@@ -578,6 +578,8 @@ npm run railway:migrate:backend
 - Confirm backend has `STRIPE_API_KEY` and storefront has `NEXT_PUBLIC_STRIPE_KEY` with **Available at Build Time**, then **Redeploy** the storefront (publishable keys are baked in at `next build`).
 - Confirm Stripe is linked on the region (Admin → Settings → Regions), or check backend logs for `Enabled Stripe (pp_stripe_stripe) on region…` after boot.
 - Selecting Stripe must initialize a payment session so Stripe Elements can mount — if the card field stays on a skeleton, refresh the payment step or re-select Stripe.
+- `NEXT_PUBLIC_DEFAULT_REGION` must be a country on your Medusa region (seed = Europe). Using `us` without a US region yields empty delivery options and blocks **Continue to payment**.
+- If delivery shows no methods, add shipping options for that region/country in Admin, then refresh checkout.
 
 **Admin invite / create account fails**
 

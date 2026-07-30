@@ -10,6 +10,7 @@ import {
   getPaymentProviderConfig,
   UNSUPPORTED_MESSAGE,
 } from "@modules/checkout/components/payment-providers/registry"
+import { isStripePublishableKeyConfigured } from "@modules/checkout/components/payment-wrapper"
 import Divider from "@modules/common/components/divider"
 import {
   Button,
@@ -20,7 +21,7 @@ import {
 } from "@modules/common/components/ui"
 import { HttpTypes } from "@medusajs/types"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 const Payment = ({
   cart,
@@ -40,6 +41,7 @@ const Payment = ({
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
     activeSession?.provider_id ?? ""
   )
+  const autoInitRef = useRef<string | null>(null)
 
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -50,6 +52,7 @@ const Payment = ({
   const activeProviderConfig = getPaymentProviderConfig(
     activeSession?.provider_id
   )
+  const stripeKeyConfigured = isStripePublishableKeyConfigured()
 
   const setPaymentMethod = async (method: string) => {
     setError(null)
@@ -60,6 +63,16 @@ const Payment = ({
 
     try {
       const providerConfig = getPaymentProviderConfig(method)
+
+      if (
+        providerConfig.requiresStripeElements &&
+        !stripeKeyConfigured
+      ) {
+        setError(
+          "Stripe card payments are unavailable: NEXT_PUBLIC_STRIPE_KEY is missing from the storefront build. Choose Manual payment, or redeploy the storefront with the publishable key available at build time."
+        )
+        return
+      }
 
       if (providerConfig.initiatesSessionOnSelect) {
         await initiatePaymentSession(cart, {
@@ -114,6 +127,16 @@ const Payment = ({
       }
 
       if (
+        selectedProviderConfig.requiresStripeElements &&
+        !stripeKeyConfigured
+      ) {
+        setError(
+          "Stripe card payments are unavailable on this storefront build. Choose Manual payment or redeploy with NEXT_PUBLIC_STRIPE_KEY."
+        )
+        return
+      }
+
+      if (
         selectedProviderConfig.requiresCardInput &&
         !cardComplete &&
         !paidByGiftcard
@@ -156,6 +179,53 @@ const Payment = ({
     }
   }, [activeSession?.provider_id, selectedPaymentMethod])
 
+  // Prefer a ready payment method when the payment step opens so customers are
+  // not stuck with an empty selection (especially when Stripe is the only option).
+  useEffect(() => {
+    if (
+      !isOpen ||
+      paidByGiftcard ||
+      selectedPaymentMethod ||
+      activeSession?.provider_id
+    ) {
+      return
+    }
+
+    const preferred =
+      availablePaymentMethods.find((method) => {
+        const config = getPaymentProviderConfig(method.id)
+        if (!config.isSupported) {
+          return false
+        }
+        if (config.requiresStripeElements && !stripeKeyConfigured) {
+          return false
+        }
+        return true
+      }) ??
+      availablePaymentMethods.find((method) =>
+        getPaymentProviderConfig(method.id).isSupported
+      )
+
+    if (!preferred) {
+      return
+    }
+
+    if (autoInitRef.current === preferred.id) {
+      return
+    }
+
+    autoInitRef.current = preferred.id
+    void setPaymentMethod(preferred.id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally run when the payment step opens
+  }, [
+    isOpen,
+    paidByGiftcard,
+    selectedPaymentMethod,
+    activeSession?.provider_id,
+    availablePaymentMethods,
+    stripeKeyConfigured,
+  ])
+
   return (
     <div className="bg-white">
       <div className="flex flex-row items-center justify-between mb-6">
@@ -196,6 +266,9 @@ const Payment = ({
                   const providerConfig = getPaymentProviderConfig(
                     paymentMethod.id
                   )
+                  const stripeUnavailable =
+                    providerConfig.requiresStripeElements &&
+                    !stripeKeyConfigured
 
                   if (providerConfig.type === "stripe") {
                     return (
@@ -206,7 +279,15 @@ const Payment = ({
                           setCardBrand={setCardBrand}
                           setError={setError}
                           setCardComplete={setCardComplete}
+                          disabled={stripeUnavailable}
                         />
+                        {stripeUnavailable &&
+                          selectedPaymentMethod === paymentMethod.id && (
+                            <Text className="text-small-regular text-ui-fg-subtle mb-2 px-1">
+                              Stripe publishable key is missing from this
+                              storefront build, so the card form cannot load.
+                            </Text>
+                          )}
                       </div>
                     )
                   }
@@ -233,7 +314,8 @@ const Payment = ({
             !paidByGiftcard && (
               <Text className="txt-medium text-ui-fg-subtle mb-4">
                 No payment methods are available for this region. Enable Stripe
-                (or Manual) under Admin → Settings → Regions.
+                (or Manual) under Admin → Settings → Regions, then refresh
+                checkout.
               </Text>
             )
           )}
@@ -266,13 +348,18 @@ const Payment = ({
               (!paidByGiftcard &&
                 (!selectedPaymentMethod ||
                   !selectedProviderConfig.isSupported ||
+                  (selectedProviderConfig.requiresStripeElements &&
+                    !stripeKeyConfigured) ||
                   (selectedProviderConfig.requiresCardInput &&
+                    stripeKeyConfigured &&
                     !cardComplete))) ||
               isLoading
             }
             data-testid="submit-payment-button"
           >
-            {selectedProviderConfig.requiresCardInput && !cardComplete
+            {selectedProviderConfig.requiresCardInput &&
+            stripeKeyConfigured &&
+            !cardComplete
               ? "Enter card details"
               : "Continue to review"}
           </Button>
