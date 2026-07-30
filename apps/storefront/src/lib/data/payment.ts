@@ -9,6 +9,8 @@ export const listCartPaymentMethods = async (regionId: string) => {
     ...(await getAuthHeaders()),
   }
 
+  // Do not force-cache: region payment providers change in Admin after Stripe
+  // is enabled, and a stale empty/manual-only list blocks checkout.
   const next = {
     ...(await getCacheOptions("payment_providers")),
   }
@@ -21,7 +23,7 @@ export const listCartPaymentMethods = async (regionId: string) => {
         query: { region_id: regionId },
         headers,
         next,
-        cache: "force-cache",
+        cache: "no-store",
       }
     )
     .then(({ payment_providers }) =>

@@ -120,7 +120,12 @@ export const StripeCardContainer = ({
             />
           </div>
         ) : (
-          <SkeletonCardDetails />
+          <div className="my-4">
+            <SkeletonCardDetails />
+            <Text className="txt-small text-ui-fg-muted mt-2">
+              Preparing secure card form…
+            </Text>
+          </div>
         ))}
     </PaymentContainer>
   )

@@ -39,10 +39,14 @@ export const buildCustomerServiceUrl = () => {
   return `${base}/${region}/customer-service`
 }
 
-export const buildAdminCustomerServiceTicketUrl = (ticketId: string) => {
-  const backendBase = (
-    process.env.MEDUSA_BACKEND_URL || "http://localhost:9000"
-  ).replace(/\/$/, "")
+const getBackendBaseUrl = () =>
+  (process.env.MEDUSA_BACKEND_URL || "http://localhost:9000").replace(/\/$/, "")
 
-  return `${backendBase}/app/customer-service/${ticketId}`
+export const buildAdminCustomerServiceTicketUrl = (ticketId: string) => {
+  return `${getBackendBaseUrl()}/app/customer-service/${ticketId}`
+}
+
+/** Admin invite acceptance URL (Medusa Admin hosts `/app/invite`). */
+export const buildAdminInviteUrl = (token: string) => {
+  return `${getBackendBaseUrl()}/app/invite?token=${encodeURIComponent(token)}`
 }

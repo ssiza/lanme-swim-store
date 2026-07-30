@@ -137,6 +137,11 @@ const Shipping: React.FC<ShippingProps> = ({
     })
 
     await setShippingMethod({ cartId: cart.id, shippingMethodId: id })
+      .then(() => {
+        // Ensure checkout RSC props (cart.shipping_methods) catch up so later
+        // payment/review steps see the selected method.
+        router.refresh()
+      })
       .catch((err) => {
         setShippingMethodId(currentId)
 
@@ -376,7 +381,7 @@ const Shipping: React.FC<ShippingProps> = ({
               className="mt"
               onClick={handleSubmit}
               isLoading={isLoading}
-              disabled={!cart.shipping_methods?.[0]}
+              disabled={!shippingMethodId || isLoading}
               data-testid="submit-delivery-option-button"
             >
               Continue to payment

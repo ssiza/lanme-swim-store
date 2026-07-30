@@ -53,14 +53,25 @@ const Payment = ({
 
   const setPaymentMethod = async (method: string) => {
     setError(null)
+    setCardComplete(false)
+    setCardBrand(null)
     setSelectedPaymentMethod(method)
+    setIsLoading(true)
 
-    const providerConfig = getPaymentProviderConfig(method)
+    try {
+      const providerConfig = getPaymentProviderConfig(method)
 
-    if (providerConfig.initiatesSessionOnSelect) {
-      await initiatePaymentSession(cart, {
-        provider_id: method,
-      })
+      if (providerConfig.initiatesSessionOnSelect) {
+        await initiatePaymentSession(cart, {
+          provider_id: method,
+        })
+        // Refresh so PaymentWrapper receives the client_secret and mounts Stripe Elements.
+        router.refresh()
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -89,32 +100,44 @@ const Payment = ({
 
   const handleSubmit = async () => {
     setIsLoading(true)
+    setError(null)
+
     try {
       if (!selectedProviderConfig.isSupported) {
         setError(UNSUPPORTED_MESSAGE)
         return
       }
 
-      const shouldInputCard =
-        selectedProviderConfig.requiresCardInput && !activeSession
+      if (!selectedPaymentMethod && !paidByGiftcard) {
+        setError("Please select a payment method")
+        return
+      }
+
+      if (
+        selectedProviderConfig.requiresCardInput &&
+        !cardComplete &&
+        !paidByGiftcard
+      ) {
+        setError("Please enter your card details")
+        return
+      }
 
       const checkActiveSession =
         activeSession?.provider_id === selectedPaymentMethod
 
-      if (!checkActiveSession) {
+      if (!checkActiveSession && selectedPaymentMethod) {
         await initiatePaymentSession(cart, {
           provider_id: selectedPaymentMethod,
         })
+        router.refresh()
       }
 
-      if (!shouldInputCard) {
-        return router.push(
-          pathname + "?" + createQueryString("step", "review"),
-          {
-            scroll: false,
-          }
-        )
-      }
+      return router.push(
+        pathname + "?" + createQueryString("step", "review"),
+        {
+          scroll: false,
+        }
+      )
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     } finally {
@@ -125,6 +148,13 @@ const Payment = ({
   useEffect(() => {
     setError(null)
   }, [isOpen])
+
+  // Keep local selection in sync when cart gains an active session after refresh.
+  useEffect(() => {
+    if (activeSession?.provider_id && !selectedPaymentMethod) {
+      setSelectedPaymentMethod(activeSession.provider_id)
+    }
+  }, [activeSession?.provider_id, selectedPaymentMethod])
 
   return (
     <div className="bg-white">
@@ -156,7 +186,7 @@ const Payment = ({
       </div>
       <div>
         <div className={isOpen ? "block" : "hidden"}>
-          {!paidByGiftcard && availablePaymentMethods?.length && (
+          {!paidByGiftcard && availablePaymentMethods?.length ? (
             <>
               <RadioGroup
                 value={selectedPaymentMethod}
@@ -199,6 +229,13 @@ const Payment = ({
                 })}
               </RadioGroup>
             </>
+          ) : (
+            !paidByGiftcard && (
+              <Text className="txt-medium text-ui-fg-subtle mb-4">
+                No payment methods are available for this region. Enable Stripe
+                (or Manual) under Admin → Settings → Regions.
+              </Text>
+            )
           )}
 
           {paidByGiftcard && (
@@ -226,14 +263,17 @@ const Payment = ({
             onClick={handleSubmit}
             isLoading={isLoading}
             disabled={
-              !selectedProviderConfig.isSupported ||
-              (selectedProviderConfig.requiresCardInput && !cardComplete) ||
-              (!selectedPaymentMethod && !paidByGiftcard)
+              (!paidByGiftcard &&
+                (!selectedPaymentMethod ||
+                  !selectedProviderConfig.isSupported ||
+                  (selectedProviderConfig.requiresCardInput &&
+                    !cardComplete))) ||
+              isLoading
             }
             data-testid="submit-payment-button"
           >
-            {!activeSession && selectedProviderConfig.requiresCardInput
-              ? " Enter card details"
+            {selectedProviderConfig.requiresCardInput && !cardComplete
+              ? "Enter card details"
               : "Continue to review"}
           </Button>
         </div>

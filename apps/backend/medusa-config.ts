@@ -220,6 +220,10 @@ module.exports = defineConfig({
     },
   },
   admin: {
+    // Used by Admin invite links and other absolute admin URLs in production.
+    backendUrl:
+      process.env.MEDUSA_BACKEND_URL?.replace(/\/$/, '') ||
+      'http://localhost:9000',
     storefrontUrl: process.env.STOREFRONT_URL || 'http://localhost:8000',
     maxUploadFileSize,
     vite: (config) => ({

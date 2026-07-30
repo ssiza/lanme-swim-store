@@ -23,6 +23,17 @@ const stripePromise = stripeKey
     )
   : null
 
+const MissingStripeKey = () => (
+  <div className="content-container py-8">
+    <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+      Stripe is selected for this cart, but{" "}
+      <code className="font-mono">NEXT_PUBLIC_STRIPE_KEY</code> is missing from
+      the storefront build. Set the publishable key on the storefront service,
+      enable <strong>Available at Build Time</strong> in Railway, and redeploy.
+    </div>
+  </div>
+)
+
 const PaymentWrapper: React.FC<PaymentWrapperProps> = ({ cart, children }) => {
   const paymentSession = cart.payment_collection?.payment_sessions?.find(
     (s) => s.status === "pending"
@@ -30,11 +41,11 @@ const PaymentWrapper: React.FC<PaymentWrapperProps> = ({ cart, children }) => {
 
   const providerConfig = getPaymentProviderConfig(paymentSession?.provider_id)
 
-  if (
-    providerConfig.requiresStripeElements &&
-    paymentSession &&
-    stripePromise
-  ) {
+  if (providerConfig.requiresStripeElements && paymentSession) {
+    if (!stripeKey || !stripePromise) {
+      return <MissingStripeKey />
+    }
+
     return (
       <StripeWrapper
         paymentSession={paymentSession}
