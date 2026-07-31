@@ -263,7 +263,7 @@ module.exports = defineConfig({
     // Baked into the Admin SPA at `medusa build` time. Use same-origin "/" so
     // production never calls http://localhost:9000 (the previous fallback),
     // which surfaces in browsers as "Load failed" on login.
-    // Runtime invite emails use getBackendBaseUrl() / MEDUSA_BACKEND_URL instead.
+    // Runtime invite emails use getAdminBaseUrl() (MEDUSA_ADMIN_URL / API origin).
     backendUrl: process.env.MEDUSA_BACKEND_URL?.replace(/\/$/, "") || "/",
     storefrontUrl: process.env.STOREFRONT_URL || "http://localhost:8000",
     maxUploadFileSize,
