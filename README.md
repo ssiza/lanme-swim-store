@@ -390,7 +390,7 @@ Verify your sending domain in Resend before going live. Update `RESEND_FROM_EMAI
 
 **Order confirmation includes:** display ID, customer email, line item titles/quantities/unit prices, order total, links to order details and account.
 
-**Admin invites:** When an admin invites a user, Resend sends `user-invited` with a link to `{MEDUSA_BACKEND_URL}/app/invite?token=...`. The invitee sets their name/password there to create the admin account. Resend the invite from Admin if the link expires.
+**Admin invites:** When an admin invites a user, Resend sends `user-invited` with a link to `{MEDUSA_BACKEND_URL or MEDUSA_ADMIN_URL}/app/invite?token=...` (e.g. `https://api.lanmeswim.com/app/invite?token=...`). That origin must serve Medusa Admin — not the storefront. If `MEDUSA_BACKEND_URL` is the marketing apex (`https://lanmeswim.com`) or storefront, invite links 404 at `/us/app/invite`; the backend then derives `https://api.<domain>` from `STOREFRONT_URL`. Resend the invite from Admin after fixing the URL.
 
 **Not yet implemented:** order canceled, marketing/abandoned cart.
 
@@ -476,7 +476,8 @@ Set these on the **backend** Railway service:
 | `ADMIN_CORS` | Yes | Public admin/API origin(s), e.g. `https://api.lanmeswim.com` (and Railway URL if you still use it) |
 | `AUTH_CORS` | Yes | Comma-separated admin/API + storefront origins |
 | `STOREFRONT_URL` | Yes | `https://store.lanmeswim.com` |
-| `MEDUSA_BACKEND_URL` | Yes | Public backend URL used in emails/invite links, e.g. `https://api.lanmeswim.com` |
+| `MEDUSA_BACKEND_URL` | Yes | Public **API** origin (`https://api.lanmeswim.com`), not `https://lanmeswim.com` / storefront |
+| `MEDUSA_ADMIN_URL` | Optional | Override for admin/invite links if it must differ from `MEDUSA_BACKEND_URL` |
 | `MEDUSA_MAX_UPLOAD_FILE_SIZE_MB` | Optional | Admin upload limit in MB (default `10`) |
 | `STORE_DEFAULT_REGION` | Yes | `gb` (or another seeded Europe country) |
 | `STRIPE_API_KEY` | Yes | `sk_live_...` |
@@ -590,7 +591,7 @@ npm run railway:migrate:backend
 
 **Admin invite / create account fails**
 
-- Confirm `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `MEDUSA_BACKEND_URL` are set on the backend (invite links use the backend URL).
+- Confirm `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `MEDUSA_BACKEND_URL=https://api.lanmeswim.com` (or `MEDUSA_ADMIN_URL`) on the backend. Invite links to `https://lanmeswim.com/app/invite` hit the storefront and 404 — resend after fixing.
 - After inviting, check Resend (or `RESEND_DEV_REDIRECT`) for the invite email; backend logs should show `Sent admin invite email to…`.
 - If the invite page says the link is invalid/expired, resend the invite from Admin → Settings → Users and use the newest email.
 - Sign out of Admin before opening an invite link (already-authenticated sessions cannot accept invites).

@@ -36,6 +36,19 @@ export default async function inviteCreatedHandler({
   }
 
   const inviteUrl = buildAdminInviteUrl(invite.token)
+  const configuredBackend = (process.env.MEDUSA_BACKEND_URL || "").replace(
+    /\/$/,
+    ""
+  )
+  if (
+    configuredBackend &&
+    configuredBackend !== "/" &&
+    !inviteUrl.startsWith(`${configuredBackend}/`)
+  ) {
+    logger.warn(
+      `invite email: MEDUSA_BACKEND_URL=${configuredBackend} looks like the storefront/marketing host; using ${inviteUrl} instead. Set MEDUSA_BACKEND_URL or MEDUSA_ADMIN_URL to the API origin that serves /app.`
+    )
+  }
 
   await notificationModuleService.createNotifications({
     to: invite.email,
@@ -49,7 +62,7 @@ export default async function inviteCreatedHandler({
   })
 
   logger.info(
-    `Sent admin invite email to ${invite.email} (invite ${invite.id}).`
+    `Sent admin invite email to ${invite.email} (invite ${invite.id}) → ${inviteUrl}`
   )
 }
 
