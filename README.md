@@ -473,10 +473,10 @@ Set these on the **backend** Railway service:
 | `JWT_SECRET` | Yes | Strong random string |
 | `COOKIE_SECRET` | Yes | Strong random string |
 | `STORE_CORS` | Yes | Storefront URL, e.g. `https://store.lanmeswim.com` |
-| `ADMIN_CORS` | Yes | Backend Railway URL, e.g. `https://<backend-service>.up.railway.app` |
-| `AUTH_CORS` | Yes | Comma-separated backend Railway URL + storefront URL |
+| `ADMIN_CORS` | Yes | Public admin/API origin(s), e.g. `https://api.lanmeswim.com` (and Railway URL if you still use it) |
+| `AUTH_CORS` | Yes | Comma-separated admin/API + storefront origins |
 | `STOREFRONT_URL` | Yes | `https://store.lanmeswim.com` |
-| `MEDUSA_BACKEND_URL` | Yes | Same as backend Railway URL |
+| `MEDUSA_BACKEND_URL` | Yes | Public backend URL used in emails/invite links, e.g. `https://api.lanmeswim.com` |
 | `MEDUSA_MAX_UPLOAD_FILE_SIZE_MB` | Optional | Admin upload limit in MB (default `10`) |
 | `STORE_DEFAULT_REGION` | Yes | `gb` (or another seeded Europe country) |
 | `STRIPE_API_KEY` | Yes | `sk_live_...` |
@@ -557,6 +557,8 @@ npm run railway:migrate:backend
 
 - Backend uses **`apps/backend/Dockerfile`** instead of Railpack so secrets (`JWT_SECRET`, `COOKIE_SECRET`) are not written into the image at build time.
 - `ADMIN_CORS` and `AUTH_CORS` must be **HTTPS origins** (your backend + storefront URLs), never `DATABASE_URL` or other `postgresql://` strings.
+- If you use a custom domain (`https://api.lanmeswim.com`), put that origin in `ADMIN_CORS` / `AUTH_CORS` / `MEDUSA_BACKEND_URL`. The backend also auto-merges `MEDUSA_BACKEND_URL` and `STOREFRONT_URL` into CORS.
+- Admin login **"Load failed"**: usually the Admin SPA was built with `backendUrl=http://localhost:9000`. Redeploy the backend after the Docker build that forces `MEDUSA_BACKEND_URL=/` at build time (runtime env can still be your public API URL).
 - `JWT_SECRET` and `COOKIE_SECRET` should be hex-only (`openssl rand -hex 32`).
 - Storefront uses **`apps/storefront/Dockerfile`** instead of Railpack — installs only the storefront workspace (not the full Lanme Swim backend) and produces a smaller standalone Next.js image.
 - If a service builds the wrong app, check Root Directory is empty and Config as Code points at the matching `apps/*/railway.toml`.

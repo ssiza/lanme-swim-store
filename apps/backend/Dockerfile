@@ -24,8 +24,13 @@ RUN npm ci --include=dev --legacy-peer-deps
 
 COPY apps/backend ./apps/backend
 
+# medusa-config.ts is loaded during build; development keeps TS resolution happy.
+# Force a same-origin Admin API base on this RUN so the SPA is not baked with
+# http://localhost:9000 (or a build-time absolute URL). Browsers then show
+# "Load failed" on login when the SPA calls localhost. Runtime env on the
+# runner still supplies MEDUSA_BACKEND_URL for invite/email absolute links.
 ENV NODE_ENV=development
-RUN npm run build --workspace=@dtc/backend
+RUN MEDUSA_BACKEND_URL=/ npm run build --workspace=@dtc/backend
 
 WORKDIR /app/apps/backend/.medusa/server
 # Prefer the npm cache filled by `npm ci` above; retry transient registry 429s.

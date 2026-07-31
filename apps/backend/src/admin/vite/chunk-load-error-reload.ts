@@ -24,7 +24,11 @@ const RELOAD_SNIPPET = `
     var message = String(
       event.reason && event.reason.message ? event.reason.message : event.reason || ""
     )
-    if (message.indexOf("Failed to fetch dynamically imported module") !== -1) {
+    if (
+      message.indexOf("Failed to fetch dynamically imported module") !== -1 ||
+      message.indexOf("Load failed") !== -1 ||
+      message.indexOf("error loading dynamically imported module") !== -1
+    ) {
       event.preventDefault()
       reloadOnce()
     }
