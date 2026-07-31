@@ -241,14 +241,22 @@ module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
     ...(redisUrl && { redisUrl }),
+    // trustProxy is honored by Express/Medusa at runtime but is not on the
+    // HttpCompression / projectConfig.http type in @medusajs/framework 2.16.0
+    // (TS2769). Cast keeps the runtime flag without failing `medusa build`.
     http: {
       storeCors,
       adminCors,
       authCors,
       jwtSecret: process.env.JWT_SECRET,
       cookieSecret: process.env.COOKIE_SECRET,
-      // Railway (and most PaaS) terminate TLS before the container.
       trustProxy: true,
+    } as {
+      storeCors: string
+      adminCors: string
+      authCors: string
+      jwtSecret: string | undefined
+      cookieSecret: string | undefined
     },
   },
   admin: {
