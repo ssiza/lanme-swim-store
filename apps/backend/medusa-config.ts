@@ -29,6 +29,36 @@ const maxUploadFileSize =
     ? maxUploadFileSizeMb * 1024 * 1024
     : 10 * 1024 * 1024
 
+/** Comma-separated origin lists: trim, drop trailing slashes, de-dupe. */
+function mergeCorsOrigins(...groups: Array<string | undefined>): string {
+  const origins = new Set<string>()
+  for (const group of groups) {
+    for (const part of (group || "").split(",")) {
+      const origin = part.trim().replace(/\/$/, "")
+      if (origin) {
+        origins.add(origin)
+      }
+    }
+  }
+  return [...origins].join(",")
+}
+
+const backendPublicUrl = process.env.MEDUSA_BACKEND_URL?.replace(/\/$/, "") || ""
+const storefrontPublicUrl = process.env.STOREFRONT_URL?.replace(/\/$/, "") || ""
+
+// Always include the public backend/storefront URLs so a custom domain
+// (e.g. https://api.lanmeswim.com) works even when CORS env still lists only
+// the Railway *.up.railway.app hostname.
+const storeCors = mergeCorsOrigins(process.env.STORE_CORS, storefrontPublicUrl)
+const adminCors = mergeCorsOrigins(process.env.ADMIN_CORS, backendPublicUrl)
+const authCors = mergeCorsOrigins(
+  process.env.AUTH_CORS,
+  process.env.ADMIN_CORS,
+  process.env.STORE_CORS,
+  backendPublicUrl,
+  storefrontPublicUrl
+)
+
 type PaymentProviderConfig = {
   resolve: string
   id: string
@@ -212,25 +242,28 @@ module.exports = defineConfig({
     databaseUrl: process.env.DATABASE_URL,
     ...(redisUrl && { redisUrl }),
     http: {
-      storeCors: process.env.STORE_CORS!,
-      adminCors: process.env.ADMIN_CORS!,
-      authCors: process.env.AUTH_CORS!,
+      storeCors,
+      adminCors,
+      authCors,
       jwtSecret: process.env.JWT_SECRET,
       cookieSecret: process.env.COOKIE_SECRET,
+      // Railway (and most PaaS) terminate TLS before the container.
+      trustProxy: true,
     },
   },
   admin: {
-    // Used by Admin invite links and other absolute admin URLs in production.
-    backendUrl:
-      process.env.MEDUSA_BACKEND_URL?.replace(/\/$/, '') ||
-      'http://localhost:9000',
-    storefrontUrl: process.env.STOREFRONT_URL || 'http://localhost:8000',
+    // Baked into the Admin SPA at `medusa build` time. Use same-origin "/" so
+    // production never calls http://localhost:9000 (the previous fallback),
+    // which surfaces in browsers as "Load failed" on login.
+    // Runtime invite emails use getBackendBaseUrl() / MEDUSA_BACKEND_URL instead.
+    backendUrl: process.env.MEDUSA_BACKEND_URL?.replace(/\/$/, "") || "/",
+    storefrontUrl: process.env.STOREFRONT_URL || "http://localhost:8000",
     maxUploadFileSize,
     vite: (config) => ({
       ...config,
       resolve: {
         ...config.resolve,
-        dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
+        dedupe: ["react", "react-dom", "react-router", "react-router-dom"],
       },
       plugins: [...(config.plugins ?? []), chunkLoadErrorReload()],
     }),
