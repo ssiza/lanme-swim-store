@@ -25,6 +25,7 @@ import {
   serializeFooterLinks,
   type FooterLink,
 } from "../../lib/footer-settings"
+import { sdk } from "../lib/sdk"
 
 type StoreFooterWidgetProps = {
   data: HttpTypes.AdminStore
@@ -154,18 +155,10 @@ const StoreFooterWidget = ({ data }: StoreFooterWidgetProps) => {
         }
       )
 
-      const response = await fetch(`/admin/stores/${data.id}`, {
+      await sdk.client.fetch(`/admin/stores/${data.id}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ metadata }),
+        body: { metadata },
       })
-
-      if (!response.ok) {
-        throw new Error("Failed to update footer settings")
-      }
 
       toast.success("Footer settings saved — storefront will refresh shortly")
     } catch (error) {

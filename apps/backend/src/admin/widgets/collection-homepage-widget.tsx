@@ -16,6 +16,7 @@ import {
   getCollectionHomepageSettings,
   toCollectionHomepageMetadata,
 } from "../../lib/collection-homepage-settings"
+import { sdk } from "../lib/sdk"
 
 type CollectionHomepageWidgetProps = {
   data: {
@@ -52,13 +53,9 @@ const CollectionHomepageWidget = ({ data }: CollectionHomepageWidgetProps) => {
     setIsSaving(true)
 
     try {
-      const response = await fetch(`/admin/collections/${data.id}`, {
+      await sdk.client.fetch(`/admin/collections/${data.id}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
+        body: {
           metadata: toCollectionHomepageMetadata({
             cover_image_url: coverImageUrl,
             mobile_image_url: mobileImageUrl,
@@ -70,12 +67,8 @@ const CollectionHomepageWidget = ({ data }: CollectionHomepageWidgetProps) => {
             featured_on_homepage: featured,
             show_products_on_homepage: showProducts,
           }),
-        }),
+        },
       })
-
-      if (!response.ok) {
-        throw new Error("Failed to update collection homepage settings")
-      }
 
       toast.success("Collection homepage settings saved")
     } catch (error) {

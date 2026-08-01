@@ -21,6 +21,7 @@ import {
   serializeHeroSlides,
   type HeroSlide,
 } from "../../lib/homepage-settings"
+import { sdk } from "../lib/sdk"
 
 type HomepageHeroWidgetProps = {
   data: HttpTypes.AdminStore
@@ -80,18 +81,10 @@ const HomepageHeroWidget = ({ data }: HomepageHeroWidgetProps) => {
         }
       )
 
-      const response = await fetch(`/admin/stores/${data.id}`, {
+      await sdk.client.fetch(`/admin/stores/${data.id}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ metadata }),
+        body: { metadata },
       })
-
-      if (!response.ok) {
-        throw new Error("Failed to update homepage hero")
-      }
 
       toast.success("Homepage hero saved")
     } catch (error) {

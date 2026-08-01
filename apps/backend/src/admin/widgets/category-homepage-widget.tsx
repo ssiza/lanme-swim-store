@@ -16,6 +16,7 @@ import {
   getCategoryHomepageSettings,
   toCategoryHomepageMetadata,
 } from "../../lib/category-homepage-settings"
+import { sdk } from "../lib/sdk"
 
 type CategoryHomepageWidgetProps = {
   data: HttpTypes.AdminProductCategory
@@ -41,13 +42,9 @@ const CategoryHomepageWidget = ({ data }: CategoryHomepageWidgetProps) => {
     setIsSaving(true)
 
     try {
-      const response = await fetch(`/admin/product-categories/${data.id}`, {
+      await sdk.client.fetch(`/admin/product-categories/${data.id}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
+        body: {
           metadata: toCategoryHomepageMetadata({
             title,
             subtitle,
@@ -56,12 +53,8 @@ const CategoryHomepageWidget = ({ data }: CategoryHomepageWidgetProps) => {
             display_order: displayOrder,
             featured_on_homepage: featured,
           }),
-        }),
+        },
       })
-
-      if (!response.ok) {
-        throw new Error("Failed to update category homepage settings")
-      }
 
       toast.success("Category homepage settings saved")
     } catch (error) {
