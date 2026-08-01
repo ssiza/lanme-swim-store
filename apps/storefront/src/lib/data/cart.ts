@@ -488,18 +488,13 @@ export async function listCartOptions() {
   const headers = {
     ...(await getAuthHeaders()),
   }
-  const next = {
-    ...(await getCacheOptions("shippingOptions")),
-  }
-
   try {
     const result = await sdk.client.fetch<{
       shipping_options: HttpTypes.StoreCartShippingOption[]
     }>("/store/shipping-options", {
       query: { cart_id: cartId },
-      next,
       headers,
-      cache: "force-cache",
+      cache: "no-store",
     })
 
     const shipping_options = result?.shipping_options ?? []
