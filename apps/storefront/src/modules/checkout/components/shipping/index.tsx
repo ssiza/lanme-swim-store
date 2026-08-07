@@ -79,29 +79,41 @@ const Shipping: React.FC<ShippingProps> = ({
 
   const hasPickupOptions = !!_pickupMethods?.length
 
+  // Medusa marks a pickup option `insufficient_inventory` when the stock
+  // location has no level for a cart item, or not enough of it. Only options
+  // that clear that check can actually be selected.
+  const selectablePickupMethod = _pickupMethods?.find(
+    (option) => !option.insufficient_inventory
+  )
+  const pickupBlockedByInventory = hasPickupOptions && !selectablePickupMethod
+
   useEffect(() => {
-    setIsLoadingPrices(true)
+    const promises = (_shippingMethods ?? [])
+      .filter((sm) => sm.price_type === "calculated")
+      .map((sm) => calculatePriceForShippingOption(sm.id, cart.id))
 
-    if (_shippingMethods?.length) {
-      const promises = _shippingMethods
-        .filter((sm) => sm.price_type === "calculated")
-        .map((sm) => calculatePriceForShippingOption(sm.id, cart.id))
+    // Nothing to price - resolve immediately. This used to be set to true
+    // unconditionally and only cleared inside `if (promises.length)`, so
+    // flat-rate-only and pickup-only carts span a loader forever.
+    if (!promises.length) {
+      setCalculatedPricesMap({})
+      setIsLoadingPrices(false)
+    } else {
+      setIsLoadingPrices(true)
 
-      if (promises.length) {
-        Promise.allSettled(promises).then((res) => {
-          const pricesMap: Record<string, number> = {}
-          res
-            .filter((r) => r.status === "fulfilled")
-            .forEach((p) => {
-              if (p.value?.id) {
-                pricesMap[p.value.id] = p.value.amount ?? 0
-              }
-            })
+      Promise.allSettled(promises).then((res) => {
+        const pricesMap: Record<string, number> = {}
+        res
+          .filter((r) => r.status === "fulfilled")
+          .forEach((p) => {
+            if (p.value?.id) {
+              pricesMap[p.value.id] = p.value.amount ?? 0
+            }
+          })
 
-          setCalculatedPricesMap(pricesMap)
-          setIsLoadingPrices(false)
-        })
-      }
+        setCalculatedPricesMap(pricesMap)
+        setIsLoadingPrices(false)
+      })
     }
 
     if (_pickupMethods?.find((m) => m.id === shippingMethodId)) {
@@ -206,13 +218,21 @@ const Shipping: React.FC<ShippingProps> = ({
                   <RadioGroup
                     value={showPickupOptions}
                     onChange={(_value) => {
-                      const id = _pickupMethods.find(
-                        (option) => !option.insufficient_inventory
-                      )?.id
+                      // Always reveal the store list, even when nothing in it
+                      // is selectable. Bailing out here left the customer
+                      // clicking a radio that produced no visible change and no
+                      // error, with "Continue to payment" disabled forever.
+                      setShowPickupOptions(PICKUP_OPTION_ON)
 
-                      if (id) {
-                        handleSetShippingMethod(id, "pickup")
+                      if (!selectablePickupMethod) {
+                        setError(
+                          "Pickup isn't available for this order - the store locations below don't have enough stock for every item in your cart. Choose a delivery option, or remove the out-of-stock item."
+                        )
+                        return
                       }
+
+                      setError(null)
+                      handleSetShippingMethod(selectablePickupMethod.id, "pickup")
                     }}
                   >
                     <Radio
@@ -354,6 +374,12 @@ const Shipping: React.FC<ShippingProps> = ({
                                     ?.address as HttpTypes.StoreCartAddress
                                 )}
                               </span>
+                              {option.insufficient_inventory && (
+                                <span className="text-base-regular text-ui-fg-muted">
+                                  Not enough stock at this location for your
+                                  cart
+                                </span>
+                              )}
                             </div>
                           </div>
                           <span className="justify-self-end text-ui-fg-base">
@@ -379,6 +405,26 @@ const Shipping: React.FC<ShippingProps> = ({
                 options are configured in Admin.
               </Text>
             )}
+
+            {!_shippingMethods?.length && pickupBlockedByInventory && (
+              <Text className="txt-medium text-ui-fg-subtle mb-4">
+                Pickup is the only option for this address, and none of the
+                store locations have enough stock for every item in your cart.
+              </Text>
+            )}
+
+            {/* The submit button is disabled until a method is stored on the
+                cart. Say so, rather than leaving a greyed-out button with no
+                explanation as the last thing the customer sees. */}
+            {!shippingMethodId &&
+              !isLoading &&
+              !error &&
+              (!!_shippingMethods?.length || !!selectablePickupMethod) && (
+                <Text className="txt-medium text-ui-fg-subtle mb-4">
+                  Select a delivery option above to continue.
+                </Text>
+              )}
+
             <ErrorMessage
               error={error}
               data-testid="delivery-option-error-message"
