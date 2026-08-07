@@ -168,6 +168,36 @@ const Shipping: React.FC<ShippingProps> = ({
     setError(null)
   }, [isOpen])
 
+  // Shoppers see a plain apology above; whoever is testing gets the real
+  // checklist here. The region is deliberately absent: region countries drive
+  // currency, tax and the address dropdown - they do NOT gate shipping options.
+  useEffect(() => {
+    if (
+      !isOpen ||
+      availableShippingMethods === null ||
+      _shippingMethods?.length ||
+      hasPickupOptions
+    ) {
+      return
+    }
+
+    console.warn(
+      [
+        `[checkout] /store/shipping-options returned 0 options for country "${
+          cart.shipping_address?.country_code ?? "?"
+        }".`,
+        "Two filters decide this, neither of them the region:",
+        "  1. cart.sales_channel_id -> stock location -> fulfillment set.",
+        "     An unlinked stock location makes the filter `id IN ()`, which",
+        "     matches nothing and returns 200 with an empty list.",
+        "  2. the service zone's geo zones must cover the address country",
+        "     (Settings -> Locations & Shipping, not Settings -> Regions).",
+        `Run: npx medusa exec ./src/scripts/diagnose-shipping-options.ts -- --cart ${cart.id}`,
+      ].join("\n")
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- warn once per options change
+  }, [isOpen, availableShippingMethods])
+
   return (
     <div className="bg-white">
       <div className="flex flex-row items-center justify-between mb-6">
@@ -400,9 +430,8 @@ const Shipping: React.FC<ShippingProps> = ({
           <div>
             {!_shippingMethods?.length && !hasPickupOptions && (
               <Text className="txt-medium text-ui-fg-subtle mb-4">
-                No delivery options are available for this address. Confirm the
-                shipping country is in your store region and that shipping
-                options are configured in Admin.
+                We can&apos;t deliver to this address yet. Try a different
+                address, or get in touch and we&apos;ll sort it out for you.
               </Text>
             )}
 
