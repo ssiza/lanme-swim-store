@@ -1,20 +1,18 @@
 "use server"
 
 import { sdk } from "@lib/config"
+import { logFetchEnd, logFetchError } from "@lib/util/storefront-fetch-log"
 import { HttpTypes } from "@medusajs/types"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { getAuthHeaders } from "./cookies"
 
 export const listCartShippingMethods = async (cartId: string) => {
   const headers = {
     ...(await getAuthHeaders()),
   }
 
-  const next = {
-    ...(await getCacheOptions("fulfillment")),
-  }
-
-  // Checkout shipping options depend on the current cart address/region.
-  // Never serve a stale empty list after the customer updates their address.
+  // Checkout shipping options depend on the current cart address/region, so
+  // this request is always uncached. Cache tags are deliberately NOT passed:
+  // they are dead weight next to `cache: "no-store"` and only obscure intent.
   return sdk.client
     .fetch<HttpTypes.StoreShippingOptionListResponse>(
       `/store/shipping-options`,
@@ -24,12 +22,21 @@ export const listCartShippingMethods = async (cartId: string) => {
           cart_id: cartId,
         },
         headers,
-        next,
         cache: "no-store",
       }
     )
-    .then(({ shipping_options }) => shipping_options)
-    .catch(() => {
+    .then(({ shipping_options }) => {
+      logFetchEnd("listCartShippingMethods", {
+        cartId,
+        count: shipping_options?.length ?? 0,
+      })
+      return shipping_options
+    })
+    .catch((error) => {
+      // Do not swallow this. When the cart is missing a sales channel, region
+      // or currency, Medusa rejects /store/shipping-options outright, and a
+      // silent null used to look identical to "no options for this address".
+      logFetchError("listCartShippingMethods", error, { cartId })
       return null
     })
 }
@@ -41,10 +48,6 @@ export const calculatePriceForShippingOption = async (
 ) => {
   const headers = {
     ...(await getAuthHeaders()),
-  }
-
-  const next = {
-    ...(await getCacheOptions("fulfillment")),
   }
 
   const body = { cart_id: cartId, data }
@@ -60,12 +63,15 @@ export const calculatePriceForShippingOption = async (
         method: "POST",
         body,
         headers,
-        next,
         cache: "no-store",
       }
     )
     .then(({ shipping_option }) => shipping_option)
-    .catch((_e) => {
+    .catch((error) => {
+      logFetchError("calculatePriceForShippingOption", error, {
+        optionId,
+        cartId,
+      })
       return null
     })
 }

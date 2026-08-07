@@ -18,28 +18,35 @@ export default async function CheckoutForm({
     return null
   }
 
-  const shippingMethods = await listCartShippingMethods(cart.id)
-  const paymentMethods = await listCartPaymentMethods(cart.region?.id ?? "")
+  const [shippingMethods, paymentMethods] = await Promise.all([
+    listCartShippingMethods(cart.id),
+    listCartPaymentMethods(cart.region?.id ?? ""),
+  ])
 
-  if (!shippingMethods) {
-    return (
-      <Text className="txt-medium text-ui-fg-subtle">
-        Delivery options could not be loaded for this cart. Check that shipping
-        is configured for your region, then refresh and try again.
-      </Text>
-    )
-  }
+  // `listCartShippingMethods` returns null only when the request itself failed.
+  // That is expected on the first render of a brand new cart, because Medusa
+  // rejects /store/shipping-options until the cart has the context it needs
+  // (sales channel, region, currency, delivery address). Bailing out here used
+  // to replace the ENTIRE checkout - address form included - with an error, so
+  // the customer had no way to supply the address that would have made the
+  // request succeed. Refreshing could never fix it. Render the form regardless
+  // and let the delivery step report its own state.
+  const shippingMethodsUnavailable = shippingMethods === null
 
   return (
     <div className="w-full grid grid-cols-1 gap-y-8">
+      {shippingMethodsUnavailable && (
+        <Text className="txt-medium text-ui-fg-subtle">
+          We couldn&apos;t load delivery options yet. Enter your shipping
+          address below and they&apos;ll appear at the delivery step.
+        </Text>
+      )}
+
       <Addresses cart={cart} customer={customer} />
 
-      <Shipping cart={cart} availableShippingMethods={shippingMethods} />
+      <Shipping cart={cart} availableShippingMethods={shippingMethods ?? []} />
 
-      <Payment
-        cart={cart}
-        availablePaymentMethods={paymentMethods ?? []}
-      />
+      <Payment cart={cart} availablePaymentMethods={paymentMethods ?? []} />
 
       <Review cart={cart} />
     </div>
