@@ -141,6 +141,10 @@ const pickupBlockers = (items: CartItem[], locationId: string) => {
   return blockers
 }
 
+/** query.graph types every relation as `Maybe<T>[]`; drop the holes. */
+const compact = <T>(values: (T | null | undefined)[]): T[] =>
+  values.filter((value): value is T => value !== null && value !== undefined)
+
 const line = (text = "") => console.log(text)
 const ok = (text: string) => console.log(`  PASS  ${text}`)
 const fail = (text: string) => console.log(`  FAIL  ${text}`)
@@ -282,9 +286,12 @@ export default async function diagnoseShippingOptions({
       }
     }
 
-    address = cart.shipping_address ?? {}
+    // query.graph's generated types describe the full entity, not the subset
+    // selected in `fields`, and mark every relation nullable. Narrow at the
+    // boundary rather than fighting it at each use site.
+    address = (cart.shipping_address ?? {}) as unknown as CartAddress
     salesChannelId = cart.sales_channel_id ?? null
-    cartItems = (cart.items ?? []) as CartItem[]
+    cartItems = compact((cart.items ?? []) as unknown as (CartItem | null)[])
 
     if (!address.country_code) {
       warn(
@@ -357,7 +364,9 @@ export default async function diagnoseShippingOptions({
     fail("sales channel is disabled")
   }
 
-  const stockLocations: StockLocation[] = channel.stock_locations ?? []
+  const stockLocations = compact(
+    (channel.stock_locations ?? []) as unknown as (StockLocation | null)[]
+  )
 
   if (!stockLocations.length) {
     fail(
@@ -435,8 +444,10 @@ export default async function diagnoseShippingOptions({
   let pickupBlocked = 0
   let zoneMatched = false
 
-  for (const set of (sets ?? []) as FulfillmentSet[]) {
-    const zones = set.service_zones ?? []
+  for (const set of compact(
+    (sets ?? []) as unknown as (FulfillmentSet | null)[]
+  )) {
+    const zones = compact(set.service_zones ?? [])
 
     if (!zones.length) {
       fail(`fulfillment set "${set.name}" has no service zones`)
